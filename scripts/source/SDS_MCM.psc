@@ -1,0 +1,1 @@
+scriptname SDS_MCM extends SKI_Configbase

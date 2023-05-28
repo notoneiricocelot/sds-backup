@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 project(
 	SDS
-	VERSION 1.1.8
+	VERSION 1.0.0
 	LANGUAGES CXX
 )
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,7 +22,7 @@ if(NOT DEFINED CompiledPluginsPath)
 	message(FATAL_ERROR "CompiledPluginsPath is not set")
 endif()
 
-option(COPY_OUTPUT "Copy the output of build operations to the game directory" OFF)
+option(COPY_OUTPUT "Copy the output of build operations to the game directory" ON)
 option(ENABLE_SKYRIM_SE "Enable support for Skyrim SE in the dynamic runtime feature." ON)
 option(ENABLE_SKYRIM_AE "Enable support for Skyrim AE in the dynamic runtime feature." OFF)
 option(ENABLE_SKYRIM_VR "Enable support for Skyrim VR in the dynamic runtime feature." OFF)

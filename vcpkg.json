@@ -1,15 +1,16 @@
 {
 	"name": "sds",
 	"version": "1.0",
-	"dependencies": [
-		"ryml",
-		"fmt",
-		"rapidcsv",
-		"rsm-binary-io",
-		"simpleini",
-		"spdlog",
-		"xbyak"
-	],
+  "dependencies": [
+    "ryml",
+    "fmt",
+    "rapidcsv",
+    "rsm-binary-io",
+    "simpleini",
+    "spdlog",
+    "xbyak",
+    "toml11"
+  ],
 	"overrides": [
 		{
 			"name": "fmt",

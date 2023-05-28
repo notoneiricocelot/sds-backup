@@ -3,10 +3,16 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
 	"${SOURCE_DIR}/SDS/Main.cpp"
+	"${SOURCE_DIR}/SDS/Common.h"
+	"${SOURCE_DIR}/SDS/Common.cpp"
 	"${SOURCE_DIR}/SDS/Papyrus.cpp"
 	"${SOURCE_DIR}/SDS/Papyrus.h"
-	"${SOURCE_DIR}/SDS/SDSInterface.cpp"
-	"${SOURCE_DIR}/SDS/SDSInterface.h"
+	"${SOURCE_DIR}/SDS/SDSClassMenu.cpp"
+	"${SOURCE_DIR}/SDS/SDSClassMenu.h"
+	"${SOURCE_DIR}/SDS/SDScaleform.cpp"
+	"${SOURCE_DIR}/SDS/SDSScaleform.h"
+	"${SOURCE_DIR}/SDS/Settings.cpp"
+	"${SOURCE_DIR}/SDS/Settings.h"
 	"${SOURCE_DIR}/SDS/PCH.h"
 )
 
@@ -79,14 +85,14 @@ set(SKSE_SUPPORT_XBYAK ON)
 add_subdirectory("$ENV{CommonLibSSEPath_NG}" CommonLibSSE EXCLUDE_FROM_ALL)
 
 find_package(xbyak REQUIRED CONFIG)
-find_package(ryml REQUIRED CONFIG)
+find_package(toml11 REQUIRED CONFIG)
 
 target_link_libraries(
 	"${PROJECT_NAME}"
 	PRIVATE
 		CommonLibSSE::CommonLibSSE
+		toml11::toml11
 		xbyak::xbyak
-		ryml::ryml
 )
 
 target_precompile_headers(
@@ -95,19 +101,24 @@ target_precompile_headers(
 		"${SOURCE_DIR}/SDS/PCH.h"
 )
 
-#install(
-#	FILES
-#		"$<TARGET_FILE:${PROJECT_NAME}>"
-#	DESTINATION "SKSE/Plugins"
-#	COMPONENT "main"
-#)
+install(
+	FILES
+		"$<TARGET_FILE:${PROJECT_NAME}>"
+	DESTINATION "SKSE/Plugins"
+	COMPONENT "main"
+)
 
-
-#if("${COPY_OUTPUT}")
-#	add_custom_command(
-#		TARGET "${PROJECT_NAME}"
-#		POST_BUILD
-#		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${PROJECT_NAME}>" "${CompiledPluginsPath}/SKSE/Plugins/"
-#		VERBATIM
-#	)
-#endif()
+if("${COPY_OUTPUT}")
+	add_custom_command(
+		TARGET "${PROJECT_NAME}"
+		POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:${PROJECT_NAME}>" "${CompiledPluginsPath}/SKSE/Plugins/"
+		VERBATIM
+	)
+	add_custom_command(
+		TARGET "${PROJECT_NAME}"
+		POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${ROOT_DIR}/cmake/sds.toml" "${CompiledPluginsPath}/SKSE/Plugins/"
+		VERBATIM
+	)
+endif()

@@ -57,50 +57,6 @@ namespace SDS
 	|  1h  |  2h | marks | block | smith | heavy | light | pick | lock | sneak | alch | speech | alt | conj | dest | ill | rest | ench |
 	*/
 
-	class Specialization
-	{
-		public:
-			Specialization(std::string i, std::string n, std::string d, SDSFocus f, SDSAttribute a1, SDSAttribute a2)
-			{
-				_ID = i;
-				Name = n;
-				Description = d;
-				focus = f;
-				firstAttribute = a1;
-				secondAttribute = a2;
-			}
-
-			std::string_view GetID() const { return _ID; };
-			std::string_view GetName() const { return Name; };
-			std::string_view GetDescription() const { return Description; };
-
-			SDSFocus GetFocus() const { return focus; }
-
-			SDSAttribute GetFirstAttribute() const { return firstAttribute; }
-
-			SDSAttribute GetSecondAttribute() const { return secondAttribute; }
-
-			int* GetSkills() { return skills; }
-
-			void SetSkillFocus(int avID, int pos)
-			{
-				skills[pos] = avID;
-			}
-
-			static inline std::vector<std::unique_ptr<Specialization>> Specializations;
-
-		protected:
-			std::string _ID;
-		private:
-
-			std::string Name;
-			std::string Description;
-			SDSFocus focus;
-			SDSAttribute firstAttribute;
-			SDSAttribute secondAttribute;
-			int skills[6];
-	};
-
 	struct ScaleformHelper
 	{
 		public:
@@ -111,4 +67,20 @@ namespace SDS
 			using AV = RE::ActorValue;
 	};
 
+	struct PlayerData
+	{
+		std::string SelectedSpecializationID;
+		int RemainingSkillPoints;
+
+		PlayerData(const std::string& SelectedSpecializationID, int RemainingSkillPoints) :
+			SelectedSpecializationID(SelectedSpecializationID), RemainingSkillPoints(RemainingSkillPoints)
+		{
+		}
+
+	
+		PlayerData(){
+			SelectedSpecializationID = "";
+			RemainingSkillPoints = 0;
+		};
+	};
 }

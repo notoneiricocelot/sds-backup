@@ -23,3 +23,11 @@ git submodule update
 cmake --preset vs2022-windows
 cmake --build build --config Release
 ```
+
+## Credits
+
+https://github.com/ianpatt/skse64/tree/master
+https://github.com/Ryan-rsm-McKenzie/CommonLibSSE
+https://github.com/Mardoxx/skyrimui
+https://github.com/ersh1/TrueDirectionalMovement/blob
+https://gitlab.com/colorglass/commonlibsse-sample-plugin

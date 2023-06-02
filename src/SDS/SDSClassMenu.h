@@ -2,7 +2,7 @@
 
 #include <RE/Skyrim.h>
 
-#include "Common.h"
+#include "Specialization.h"
 
 namespace SDS
 {

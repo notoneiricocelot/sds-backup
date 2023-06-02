@@ -4,17 +4,15 @@
 
 namespace SDS
 {
-	bool RegisterSDSInterface(RE::BSScript::IVirtualMachine* vm);
-
-	void InitializeHook();
 
 	constexpr std::string_view PapyrusClass = "SDSInterface";
 
 	class OnClassAcceptedHandler : public SKSE::RegistrationSet<INT32>
 	{
 		public:
-		static OnClassAcceptedHandler* GetSingleton();
+			static OnClassAcceptedHandler* GetSingleton();
 
+			static constexpr char EVN_NAME[] = "SDSClassSelected";
 		private:
 			using Base = SKSE::RegistrationSet<INT32>;
 
@@ -26,6 +24,15 @@ namespace SDS
 			OnClassAcceptedHandler& operator=(const OnClassAcceptedHandler&) = delete;
 			OnClassAcceptedHandler& operator=(OnClassAcceptedHandler&&) = delete;
 
-			static constexpr char EVN_NAME[] = "SDSClassAccepted";
+	};
+
+	class SDSInterface
+	{
+		public:
+			static void SDSClassSelected(RE::StaticFunctionTag*, std::string name);
+
+			static bool Register(RE::BSScript::IVirtualMachine* vm);
+
+			static constexpr char PapyrusClass[] = "SDSInterface";
 	};
 }

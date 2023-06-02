@@ -59,13 +59,14 @@ namespace
 	 */
 	void InitializeSerialization()
 	{
-		SKSE::log::trace("Initializing cosave serialization...");
+		//SKSE::log::trace("Initializing cosave serialization...");
 		auto* serde = SKSE::GetSerializationInterface();
+
 		serde->SetUniqueID(_byteswap_ulong('SDSI'));
-		serde->SetSaveCallback(SDS::SDSScaleform::OnGameSaved);
-		serde->SetRevertCallback(SDS::SDSScaleform::OnRevert);
-		serde->SetLoadCallback(SDS::SDSScaleform::OnGameLoaded);
-		SKSE::log::trace("Cosave serialization initialized.");
+		serde->SetSaveCallback(SDS::Settings::OnGameSaved);
+		serde->SetRevertCallback(SDS::Settings::OnRevert);
+		serde->SetLoadCallback(SDS::Settings::OnGameLoaded);
+		//SKSE::log::trace("Cosave serialization initialized.");
 	}
 
 	/**
@@ -86,7 +87,7 @@ namespace
 	{
 		// RE::BSScript
 		SKSE::log::trace("Initializing Papyrus binding...");
-		if (SKSE::GetPapyrusInterface()->Register(SDS::RegisterSDSInterface)) {
+		if (SKSE::GetPapyrusInterface()->Register(SDS::SDSInterface::Register)) {
 			SKSE::log::debug("Papyrus functions bound.");
 		} else {
 			SKSE::stl::report_and_fail("Failure to register Papyrus bindings.");
@@ -171,6 +172,8 @@ namespace
 		// Player's selected save game has finished loading.
 		case SKSE::MessagingInterface::kPostLoadGame:
 		// Data will be a boolean indicating whether the load was successful.
+			SDS::Settings::OnPostLoadGame();
+			break;
 		// The player has saved a game.
 		case SKSE::MessagingInterface::kSaveGame:
 		// Data will be the save name.

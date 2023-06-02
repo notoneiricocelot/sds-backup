@@ -1,5 +1,6 @@
 #include "SDSClassMenu.h"
 #include "Settings.h"
+#include "Specialization.h"
 #include "Papyrus.h"
 
 namespace SDS
@@ -58,59 +59,23 @@ namespace SDS
 		return new SDSClassMenu();
 	}
 
-	void SDSClassMenu::AddToClassList(Specialization* spec, RE::GFxValue& a_array)
-	{
-		RE::GFxValue data;
-		uiMovie->CreateObject(&data);
-
-		RE::GFxValue classID;
-		classID.SetString(spec->GetID());
-		RE::GFxValue name;
-		name.SetString(spec->GetName());
-		RE::GFxValue desc;
-		desc.SetString(spec->GetDescription());
-
-		RE::GFxValue focus;
-		focus.SetNumber(static_cast<int>(spec->GetFocus()));
-		RE::GFxValue attr1;
-		attr1.SetNumber(static_cast<int>(spec->GetFirstAttribute()));
-		RE::GFxValue attr2;
-		attr2.SetNumber(static_cast<int>(spec->GetSecondAttribute()));
-
-		int* specSkills = spec->GetSkills();
-		RE::GFxValue gfxSkills;
-		uiMovie->CreateArray(&gfxSkills);
-
-		for (int i = 0; i < 6; i++) {
-			RE::GFxValue skill;
-			skill.SetNumber(*(specSkills + i));
-			gfxSkills.PushBack(skill);
-		}
-
-		data.SetMember("id", classID);
-		data.SetMember("name", name);
-		data.SetMember("description", desc);
-		data.SetMember("focus", focus);
-		data.SetMember("attr1", attr1);
-		data.SetMember("attr2", attr2);
-		data.SetMember("skills", gfxSkills);
-
-		a_array.PushBack(data);
-	}
-
 	void SDSClassMenu::OnMenuOpen()
 	{
 		uiMovie->SetVisible(true);
 
 		RE::GFxValue classArray;
 		RE::GFxValue playerObject;
-		RE::GFxValue menuCall;
 
 		uiMovie->CreateArray(&classArray);
 		uiMovie->CreateObject(&playerObject);
 
 		for (int i = 0; i < Specialization::Specializations.size(); ++i) {
-			AddToClassList(Specialization::Specializations[i].get(), classArray);
+			RE::GFxValue data;
+			uiMovie->CreateObject(&data);
+
+			Specialization::Specializations[i].get()->ToGfxValue(&data, uiMovie);
+			classArray.PushBack(data);
+
 		}
 
 		auto hud = RE::UI::GetSingleton()->GetMenu(RE::HUDMenu::MENU_NAME);
@@ -142,7 +107,7 @@ namespace SDS
 
 	void SDSClassMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
-		a_processor->Process("SDSClassSelected", SDSClassSelected);
+		a_processor->Process(OnClassAcceptedHandler::EVN_NAME, SDSClassSelected);
 	}
 
 	void SDSClassMenu::SDSClassSelected(const RE::FxDelegateArgs& a_params)
@@ -155,6 +120,10 @@ namespace SDS
 
 	void SDSClassMenu::SDSClassSelected(std::string a_id)
 	{
+		Settings::Saved->SelectedSpecializationID = a_id;
+		SDSInterface::SDSClassSelected(nullptr, a_id);
 		SKSE::log::info("{} class selected"sv, a_id);
+
+		Close();
 	}
 }

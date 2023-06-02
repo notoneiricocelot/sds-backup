@@ -146,8 +146,8 @@
 	attr2 = 4
 	skills = [8, 12, 16, 19, 20, 23]
 [generalSettings]
-	entryColor = "#CCCCCC"
-	statColor = "#BBBCAD"
+	entryColor = "#C4C4C4"
+	statColor = "#bbbcad"
 	titleColor = "#A5987F"
 	negativeChangeColor = ""
 	positiveChangeColor = ""

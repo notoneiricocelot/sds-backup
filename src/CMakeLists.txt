@@ -5,6 +5,8 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/SDS/Main.cpp"
 	"${SOURCE_DIR}/SDS/Common.h"
 	"${SOURCE_DIR}/SDS/Common.cpp"
+	"${SOURCE_DIR}/SDS/Specialization.h"
+	"${SOURCE_DIR}/SDS/Specialization.cpp"
 	"${SOURCE_DIR}/SDS/Papyrus.cpp"
 	"${SOURCE_DIR}/SDS/Papyrus.h"
 	"${SOURCE_DIR}/SDS/SDSClassMenu.cpp"

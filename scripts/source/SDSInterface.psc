@@ -1,3 +1,4 @@
-scriptname SDSInterface extends Form
+scriptname SDSInterface Hidden
 
-Event SDSClassAccepted() native
+Event SDSClassAccepted(String className)
+EndEvent

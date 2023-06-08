@@ -1,5 +1,5 @@
 #include "Papyrus.h"
-#include "SDSScaleform.h"
+#include "Scaleform.h"
 #include "Settings.h"
 
 #include <stddef.h>

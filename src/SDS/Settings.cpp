@@ -69,8 +69,9 @@ namespace SDS
 		constexpr auto defaultSettingsPath = L"Data/MCM/Config/SDSInterface/settings.ini";
 		constexpr auto mcmPath = L"Data/MCM/Settings/SDSInterface.ini";
 
+		constexpr auto experienceIniPath = L"Data/SKSE/Plugins/Experience.ini";
+
 		// Load class data and mod settings from toml file
-		ReadTomlConfig(dataPath);
 
 		const auto readMCM = [&](std::filesystem::path path) {
 			CSimpleIniA mcm;
@@ -89,8 +90,24 @@ namespace SDS
 
 			ReadFloatSetting(mcm, "General", "fSkillPointsLevelMultiplier", fSkillPointsLevelMultiplier);
 		};
+
+		const auto readExperienceIni = [&](std::filesystem::path path) {
+			CSimpleIniA experienceIni;
+			experienceIni.SetUnicode();
+			experienceIni.LoadFile(path.string().c_str());
+
+			ReadFloatSetting(experienceIni, "General", "fSkillCapBase", fSkillCapBase);
+			ReadFloatSetting(experienceIni, "General", "fSkillCapMult", fSkillCapMult);
+
+			ReadUInt32Setting(experienceIni, "General", "iMaxPlayerLevel", (uint32_t&)iMaxPlayerLevel);
+
+			ReadBoolSetting(experienceIni, "General", "bUseRacialCaps", bUseRacialCaps);
+		};
+
+		ReadTomlConfig(dataPath);
 		readMCM(defaultSettingsPath);
 		readMCM(mcmPath);
+		readExperienceIni(experienceIniPath);
 	}
 
 	void Settings::OnPostLoadGame()
@@ -116,7 +133,7 @@ namespace SDS
 		}
 	}
 
-	void Settings::ReadFloatSetting([[maybe_unused]] CSimpleIniA& a_ini, [[maybe_unused]] const char* a_sectionName, const char* a_settingName, [[maybe_unused]] float& a_setting)
+	void Settings::ReadFloatSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, float& a_setting)
 	{
 		const char* bFound = nullptr;
 		bFound = a_ini.GetValue(a_sectionName, a_settingName);
@@ -133,13 +150,13 @@ namespace SDS
 		Settings::Saved->RemainingSkillPoints = 0;
 	}
 
-	void Settings::OnGameLoaded([[maybe_unused]] SKSE::SerializationInterface* serde)
+	void Settings::OnGameLoaded(SKSE::SerializationInterface* serde)
 	{
 		std::unique_lock lock(_lock);
 
-		[[maybe_unused]] std::uint32_t type = 0;
-		[[maybe_unused]] std::uint32_t size = 0;
-		[[maybe_unused]] std::uint32_t version = 0;
+		std::uint32_t type = 0;
+		std::uint32_t size = 0;
+		std::uint32_t version = 0;
 		// To load records from a cosave, use <code>GetNextRecordInfo</code> to iterate from one record to the next.
 		// You will be given records in the order they were written, but otherwise you do not look up a record by its name.
 		// Instead check the result of each iteration to find out which record it is and handle it appropriately.
@@ -154,7 +171,7 @@ namespace SDS
 		}
 	}
 
-	void Settings::OnGameSaved([[maybe_unused]] SKSE::SerializationInterface* serde)
+	void Settings::OnGameSaved(SKSE::SerializationInterface* serde)
 	{
 		std::unique_lock lock(_lock);
 

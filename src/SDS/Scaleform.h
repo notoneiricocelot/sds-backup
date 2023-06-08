@@ -1,9 +1,5 @@
 #pragma once
 
-#include <RE/Skyrim.h>
-
-#include "SDSClassMenu.h"
-
 namespace SDS
 {
 	/**

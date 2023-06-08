@@ -1,7 +1,10 @@
 #include <SKSE/SKSE.h>
 
-#include "SDSScaleform.h"
+#include "Scaleform.h"
 #include "Settings.h"
+
+#include "LevelUp.h"
+#include "ClassMenu.h"
 
 namespace SDS
 {
@@ -29,9 +32,7 @@ namespace SDS
 					SDSClassMenu::Open();
 			}
 		} else if (a_event && a_event->menuName == RE::LevelUpMenu::MENU_NAME) {
-			if (a_event->opening) {
-			} else {
-			}
+			LevelUpMenuHandler::OnMenuChange(a_event->opening);
 		} else if (a_event && a_event->menuName == RE::DialogueMenu::MENU_NAME) {
 			if (a_event->opening) {
 			} else {

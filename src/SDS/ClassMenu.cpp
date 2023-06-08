@@ -1,7 +1,9 @@
-#include "SDSClassMenu.h"
+#include "ClassMenu.h"
 #include "Settings.h"
 #include "Specialization.h"
 #include "Papyrus.h"
+
+#include "ScaleformHelper.h"
 
 namespace SDS
 {
@@ -89,7 +91,7 @@ namespace SDS
 
 		SKSE::log::info("Menu {} loaded, classes invoked, updating player data"sv, SDSClassMenu::Name());
 
-		ScaleformHelper::FillPlayerObject(&playerObject);
+		ScaleformHelper::GetPlayerObject(&playerObject);
 		uiMovie->Invoke("_root.ClassSelector_mc.UpdatePlayerInfo", nullptr, &playerObject, 1);
 	}
 

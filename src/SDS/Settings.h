@@ -23,8 +23,8 @@ namespace SDS
 
 		/*
 			MCM leveling settings
+			[General]
 		*/
-		// General
 		static inline bool bSSLDebugEnabled = false;
 
 		static inline int iMaxLevelsPerSkillPerPlayerLevel = 5;
@@ -35,7 +35,17 @@ namespace SDS
 		static inline int iSkillPointsPerLevel = 15;
 		static inline int iSkillPointsCap = 45;
 
-		static inline float fSkillPointsLevelMultiplier = 1.5;
+		static inline float fSkillPointsLevelMultiplier = 1.5f;
+
+		/*
+			Experience settings
+			https://www.nexusmods.com/skyrimspecialedition/mods/17751?tab=description
+			[General]
+		*/
+		static inline float fSkillCapBase = 18.0f;
+		static inline float fSkillCapMult = 2.0f;
+		static inline int iMaxPlayerLevel = 255;
+		static inline bool bUseRacialCaps = true;
 
 		static void ReadBoolSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, bool& a_setting);
 		static void ReadUInt32Setting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, uint32_t& a_setting);

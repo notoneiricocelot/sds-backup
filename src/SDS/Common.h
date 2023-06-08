@@ -57,16 +57,6 @@ namespace SDS
 	|  1h  |  2h | marks | block | smith | heavy | light | pick | lock | sneak | alch | speech | alt | conj | dest | ill | rest | ench |
 	*/
 
-	struct ScaleformHelper
-	{
-		public:
-			static void FillPlayerObject(RE::GFxValue* playerObject);
-			static void FillBottomBarObjectDefault(RE::GFxValue* bottombarObject);
-
-		private:
-			using AV = RE::ActorValue;
-	};
-
 	struct PlayerData
 	{
 		std::string SelectedSpecializationID;
@@ -77,7 +67,6 @@ namespace SDS
 		{
 		}
 
-	
 		PlayerData(){
 			SelectedSpecializationID = "";
 			RemainingSkillPoints = 0;

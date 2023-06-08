@@ -1,8 +1,11 @@
+#include "ScaleformHelper.h"
+
 #include "Common.h"
+#include "Settings.h"
 
 namespace SDS
 {
-	void ScaleformHelper::FillPlayerObject(RE::GFxValue* playerObject)
+	void ScaleformHelper::GetPlayerObject(RE::GFxValue* playerObject)
 	{
 		auto player = RE::PlayerCharacter::GetSingleton();
 		auto actorValueOwner = player->AsActorValueOwner();
@@ -47,11 +50,48 @@ namespace SDS
 		playerObject->SetMember("staminaColor", playerValues[12]);
 	}
 
-	void ScaleformHelper::FillBottomBarObjectDefault(RE::GFxValue* bottombarObject)
+	void ScaleformHelper::GetBottomBarObjectDefault(RE::GFxValue* bottombarObject)
 	{
 		RE::GFxValue itemType;
 		itemType.SetNumber(static_cast<int>(InventoryDefine::kArmor));
 
 		bottombarObject->SetMember("type", itemType);
+	}
+
+	void ScaleformHelper::GetActorBaseAVs(RE::GFxValue* av_list)
+	{
+		auto player = RE::PlayerCharacter::GetSingleton();
+		auto actorValueOwner = player->AsActorValueOwner();
+
+		for (AV i = AV::kAggression; i <= AV::kReflectDamage;) {
+			av_list->PushBack(static_cast<int>(actorValueOwner->GetBaseActorValue(i)));
+
+			i = static_cast<AV>(static_cast<int>(i) + 1);
+		}
+	}
+
+	void ScaleformHelper::GetPlayerSkillCaps(RE::GFxValue* av_skills)
+	{
+		auto player = RE::PlayerCharacter::GetSingleton();
+		int baseCap = static_cast<int>(Settings::fSkillCapBase + Settings::fSkillCapMult * player->GetLevel());
+
+		int racialBoostIndex = 0;
+		RE::RACE_DATA::SkillBoost* boost = nullptr;
+		auto skillBoosts = player->GetRace()->data.skillBoosts;
+
+		for (AV i = AV::kOneHanded; i <= AV::kEnchanting;) {
+			av_skills->PushBack(baseCap);
+			i = static_cast<AV>(static_cast<int>(i) + 1);
+		}
+
+		if (Settings::bUseRacialCaps) {
+			for (int i = 0; i < RE::RACE_DATA::kNumSkillBoosts; i++) {
+				boost = &skillBoosts[i];
+				if (boost) {
+					racialBoostIndex = static_cast<int>(boost->skill.get()) - 6;
+					av_skills->SetElement(racialBoostIndex, baseCap + boost->bonus);
+				}
+			}
+		}
 	}
 }

@@ -73,7 +73,7 @@ namespace SDS
 	void ScaleformHelper::GetPlayerSkillCaps(RE::GFxValue* av_skills)
 	{
 		auto player = RE::PlayerCharacter::GetSingleton();
-		int baseCap = static_cast<int>(Settings::fSkillCapBase + Settings::fSkillCapMult * player->GetLevel());
+		int baseCap = static_cast<int>(Settings::fSkillCapBase_Experience + Settings::fSkillCapMult_Experience * player->GetLevel());
 
 		int racialBoostIndex = 0;
 		RE::RACE_DATA::SkillBoost* boost = nullptr;
@@ -84,7 +84,7 @@ namespace SDS
 			i = static_cast<AV>(static_cast<int>(i) + 1);
 		}
 
-		if (Settings::bUseRacialCaps) {
+		if (Settings::bUseRacialCaps_Experience) {
 			for (int i = 0; i < RE::RACE_DATA::kNumSkillBoosts; i++) {
 				boost = &skillBoosts[i];
 				if (boost) {
@@ -92,6 +92,14 @@ namespace SDS
 					av_skills->SetElement(racialBoostIndex, baseCap + boost->bonus);
 				}
 			}
+		}
+	}
+
+	void ScaleformHelper::GetAttributes(RE::GFxValue* attributes)
+	{
+		for (SDSAttribute a = SDSAttribute::kStrength; a < SDSAttribute::kFaith;) {
+			attributes->PushBack(PlayerData::GetGeneratedAV(a));
+			a = static_cast<SDSAttribute>(static_cast<int>(a) + 1);
 		}
 	}
 }

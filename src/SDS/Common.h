@@ -71,5 +71,7 @@ namespace SDS
 			SelectedSpecializationID = "";
 			RemainingSkillPoints = 0;
 		};
+
+		static uint32_t GetGeneratedAV([[maybe_unused]] SDSAttribute AVName) { return 0; };
 	};
 }

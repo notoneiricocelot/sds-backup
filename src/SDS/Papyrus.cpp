@@ -2,10 +2,6 @@
 
 namespace SDS
 {
-	void SDSInterface::SDSClassSelected(RE::StaticFunctionTag*, [[maybe_unused]] std::string name)
-	{
-
-	}
 
 	/**
 	 * This is the function that acts as a registration callback for Papyrus functions. Within you can register functions
@@ -17,6 +13,11 @@ namespace SDS
 	{
 		a_vm->RegisterFunction(OnClassAcceptedHandler::EVN_NAME, PapyrusClass, SDSClassSelected);
 		return true;
+	}
+
+	void SDSInterface::SDSClassSelected(RE::StaticFunctionTag*, [[maybe_unused]] std::string name)
+	{
+
 	}
 
 	OnClassAcceptedHandler* OnClassAcceptedHandler::GetSingleton()

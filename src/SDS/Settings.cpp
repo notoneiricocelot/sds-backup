@@ -6,21 +6,6 @@
 namespace SDS
 {
 
-	void InitializeHook()
-	{
-		// The trampoline can be used to write a new call instruction at a given address (here the start of the function for
-		// HitData::Populate). We use write_code<5> to indicate this is a 5-byte call instruction (rather than the much
-		// rarer 6-byte call). We pass in the address of our function that will be called, and a pointer to the trampoline
-		// function is returned.
-		//
-		// The trampoline pointed to contains any instructions from the original function we overwrote and a call to the
-		// instruction that comes after, so that if we call that address as a function, we are in effect calling the
-		// original code.
-		// OriginalPopulateHitData = trampoline.write_call<5>(GetHookedFunction().address(),
-		//												reinterpret_cast<uintptr_t>(PopulateHitData));
-		SKSE::log::debug("Hooks initialized.");
-	}
-
 	void ReadTomlConfig(std::string path)
 	{
 		SKSE::log::info("Reading {}", path);
@@ -51,7 +36,7 @@ namespace SDS
 			util::report_and_fail("Configuration file incomplete"sv);
 		}
 
-		SKSE::log::info("Reading {} completed, loaded {} classes", path, Specialization::Specializations.size());
+		SKSE::log::info("Reading config {} completed, loaded {} classes", path, Specialization::Specializations.size());
 	}
 
 	void Settings::Initialize()
@@ -96,12 +81,12 @@ namespace SDS
 			experienceIni.SetUnicode();
 			experienceIni.LoadFile(path.string().c_str());
 
-			ReadFloatSetting(experienceIni, "General", "fSkillCapBase", fSkillCapBase);
-			ReadFloatSetting(experienceIni, "General", "fSkillCapMult", fSkillCapMult);
+			ReadFloatSetting(experienceIni, "General", "fSkillCapBase", fSkillCapBase_Experience);
+			ReadFloatSetting(experienceIni, "General", "fSkillCapMult", fSkillCapMult_Experience);
 
-			ReadUInt32Setting(experienceIni, "General", "iMaxPlayerLevel", (uint32_t&)iMaxPlayerLevel);
+			ReadUInt32Setting(experienceIni, "General", "iMaxPlayerLevel", (uint32_t&)iMaxPlayerLevel_Experience);
 
-			ReadBoolSetting(experienceIni, "General", "bUseRacialCaps", bUseRacialCaps);
+			ReadBoolSetting(experienceIni, "General", "bUseRacialCaps", bUseRacialCaps_Experience);
 		};
 
 		ReadTomlConfig(dataPath);
@@ -112,7 +97,16 @@ namespace SDS
 
 	void Settings::OnPostLoadGame()
 	{
+		Settings::selectedSpecIndex = Specialization::Find(Settings::Saved->SelectedSpecializationID);
 
+		RE::ActorValueList* playerAVs = RE::ActorValueList::GetSingleton();
+
+		// disable skill experience gain from skills use
+		for (RE::ActorValue i = RE::ActorValue::kOneHanded; i <= RE::ActorValue::kEnchanting;) {
+			playerAVs->GetActorValue(i)->skill->useMult = 0;
+
+			i = static_cast<RE::ActorValue>(static_cast<int>(i) + 1);
+		}
 	}
 
 	void Settings::ReadBoolSetting([[maybe_unused]] CSimpleIniA& a_ini, [[maybe_unused]] const char* a_sectionName, const char* a_settingName, bool& a_setting)
@@ -169,6 +163,7 @@ namespace SDS
 				serde->ReadRecordData(&Settings::Saved->RemainingSkillPoints, sizeof(Settings::Saved->RemainingSkillPoints));
 			}
 		}
+		SKSE::log::info("Config loaded, class: {}, remaining skillPoints: {}", Settings::Saved->SelectedSpecializationID, Settings::Saved->RemainingSkillPoints);
 	}
 
 	void Settings::OnGameSaved(SKSE::SerializationInterface* serde)

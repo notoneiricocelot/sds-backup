@@ -5,8 +5,6 @@
 namespace SDS
 {
 
-	void InitializeHook();
-
 	struct Settings
 	{
 		using Lock = std::recursive_mutex;
@@ -15,6 +13,11 @@ namespace SDS
 		static void Initialize();
 		static void ReadSettings();
 		static void OnPostLoadGame();
+
+		/*
+			Game Settings
+		*/
+		static inline int selectedSpecIndex = -1;
 
 		/*
 			Sezialization ID
@@ -42,10 +45,10 @@ namespace SDS
 			https://www.nexusmods.com/skyrimspecialedition/mods/17751?tab=description
 			[General]
 		*/
-		static inline float fSkillCapBase = 18.0f;
-		static inline float fSkillCapMult = 2.0f;
-		static inline int iMaxPlayerLevel = 255;
-		static inline bool bUseRacialCaps = true;
+		static inline float fSkillCapBase_Experience = 18.0f;
+		static inline float fSkillCapMult_Experience = 2.0f;
+		static inline int iMaxPlayerLevel_Experience = 255;
+		static inline bool bUseRacialCaps_Experience = true;
 
 		static void ReadBoolSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, bool& a_setting);
 		static void ReadUInt32Setting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, uint32_t& a_setting);

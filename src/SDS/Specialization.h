@@ -25,9 +25,9 @@ namespace SDS
 
 		static inline std::vector<std::unique_ptr<Specialization>> Specializations;
 
-		std::string_view GetID() const { return _ID; };
-		std::string_view GetName() const { return Name; };
-		std::string_view GetDescription() const { return Description; };
+		std::string GetID() const { return _ID; };
+		std::string GetName() const { return Name; };
+		std::string GetDescription() const { return Description; };
 
 		SDSFocus GetFocus() const { return focus; }
 
@@ -43,6 +43,8 @@ namespace SDS
 		}
 
 		void ToGfxValue(RE::GFxValue* val, RE::GPtr<RE::GFxMovieView> uiMovie);
+
+		static int Find(std::string id);
 
 	protected:
 		std::string _ID;

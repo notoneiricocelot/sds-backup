@@ -22,12 +22,9 @@ namespace SDS
 	{
 		if (a_event && a_event->menuName == RE::RaceSexMenu::MENU_NAME) {
 			if (!a_event->opening) {
-				//auto ui = RE::UI::GetSingleton();
-
 				if (Settings::bSSLDebugEnabled)
 					SKSE::log::info("Sending message to SDSClassMenu"sv);
 
-				// ui->GetEventSource<RE::MenuOpenCloseEvent>()->RemoveEventSink(SDSScaleform::GetSingleton());
 				if (Settings::Saved->SelectedSpecializationID.length() == 0)
 					SDSClassMenu::Open();
 			}

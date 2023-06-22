@@ -19,4 +19,15 @@ namespace SDS
 		}
 		val->SetMember("skills", s);
 	}
+	int Specialization::Find(std::string id)
+	{
+		int i = 0;
+		for (auto const& it : Specializations) {
+			// return 0 if equal
+			if (!it->GetID().compare(id))
+				return i;
+			i += 1;
+		}
+		return -1;
+	}
 }

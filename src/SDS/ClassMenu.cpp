@@ -80,6 +80,7 @@ namespace SDS
 
 		}
 
+		// hidding compass in our custom menu
 		auto hud = RE::UI::GetSingleton()->GetMenu(RE::HUDMenu::MENU_NAME);
 		hud.get()->uiMovie->GetVariable(&_compas_alpha, "HUDMovieBaseInstance.CompassShoutMeterHolder._alpha");
 
@@ -87,6 +88,7 @@ namespace SDS
 		zeroAlpha.SetNumber(0.f);
 		hud.get()->uiMovie->SetVariable("HUDMovieBaseInstance.CompassShoutMeterHolder._alpha", zeroAlpha);
 
+		// loading class list
 		uiMovie->Invoke("_root.ClassSelector_mc.loadClasses", nullptr, &classArray, 1);
 
 		SKSE::log::info("Menu {} loaded, classes invoked, updating player data"sv, SDSClassMenu::Name());
@@ -97,6 +99,8 @@ namespace SDS
 
 	void SDSClassMenu::OnMenuClose()
 	{
+		// Thanks to Ersh for TrueHUD source
+		// https://github.com/ersh1/TrueHUD/blob/master/src/Scaleform/TrueHUDMenu.cpp#L1309
 		auto hud = RE::UI::GetSingleton()->GetMenu(RE::HUDMenu::MENU_NAME);
 		hud.get()->uiMovie->SetVariable("HUDMovieBaseInstance.CompassShoutMeterHolder._alpha", _compas_alpha);
 	}
@@ -105,6 +109,10 @@ namespace SDS
 	{
 		RE::GFxValue boolean(true);
 		uiMovie->SetVariable("_global.gfxExtensions", boolean);
+	}
+
+	void SDSClassMenu::AddToClassList([[maybe_unused]] Specialization* spec, [[maybe_unused]] RE::GFxValue& a_array)
+	{
 	}
 
 	void SDSClassMenu::Accept(RE::FxDelegateHandler::CallbackProcessor* a_processor)

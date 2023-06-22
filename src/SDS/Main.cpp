@@ -2,6 +2,8 @@
 #include "Scaleform.h"
 #include "Settings.h"
 
+#include "Hooks.h"
+
 #include <stddef.h>
 
 namespace
@@ -110,9 +112,19 @@ namespace
 	 * suffice for our demo project.
 	 * </p>
 	 */
-	void InitializeHooking()
+	void InitializeHooks()
 	{
-		SDS::InitializeHook();
+		// The trampoline can be used to write a new call instruction at a given address (here the start of the function for
+		// HitData::Populate). We use write_code<5> to indicate this is a 5-byte call instruction (rather than the much
+		// rarer 6-byte call). We pass in the address of our function that will be called, and a pointer to the trampoline
+		// function is returned.
+		//
+		// The trampoline pointed to contains any instructions from the original function we overwrote and a call to the
+		// instruction that comes after, so that if we call that address as a function, we are in effect calling the
+		// original code.
+
+		SDS::HUDHooks::Hook();
+		SKSE::log::debug("Hooks initialized.");
 	}
 
 	void InitializeScaleform()
@@ -158,8 +170,8 @@ namespace
 			// Read our settings file and prepare data
 			SDS::Settings::Initialize();
 			SDS::Settings::ReadSettings();
-			// Init hooks (nothing here at least now, just for future upadtes)
-			InitializeHooking();
+			// init hooks to native functions
+			InitializeHooks();
 			// Init user interface callbacks
 			InitializeScaleform();
 			break;

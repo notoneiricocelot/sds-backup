@@ -35,7 +35,7 @@ namespace SDS
 			static void SDSClassSelected(std::string a_id);
 
 			void InitExtensions();
-			void AddToClassList(Specialization* spec, RE::GFxValue& a_array);
+			virtual void AddToClassList(Specialization* spec, RE::GFxValue& a_array);
 
 			RE::GFxValue _compas_alpha;
 

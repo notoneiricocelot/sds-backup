@@ -10,6 +10,8 @@ namespace SDS
 		static void GetActorBaseAVs(RE::GFxValue* av_list);
 		static void GetPlayerSkillCaps(RE::GFxValue* av_skills);
 
+		static void GetAttributes(RE::GFxValue* attributes);
+
 	private:
 		using AV = RE::ActorValue;
 	};

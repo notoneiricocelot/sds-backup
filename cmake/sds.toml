@@ -149,5 +149,5 @@
 	entryColor = "#c4c4c4"
 	statColor = "#bbbcad"
 	titleColor = "#A5987F"
-	negativeChangeColor = ""
-	positiveChangeColor = ""
+	negativeChangeColor = "#ae2127"
+	positiveChangeColor = "#3c61b3"

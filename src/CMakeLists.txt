@@ -16,6 +16,8 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/SDS/ClassMenu.h"
 	"${SOURCE_DIR}/SDS/LevelUp.cpp"
 	"${SOURCE_DIR}/SDS/LevelUp.h"
+	"${SOURCE_DIR}/SDS/Hooks.cpp"
+	"${SOURCE_DIR}/SDS/Hooks.h"
 	"${SOURCE_DIR}/SDS/Settings.cpp"
 	"${SOURCE_DIR}/SDS/Settings.h"
 	"${SOURCE_DIR}/SDS/PCH.h"

@@ -3,20 +3,16 @@
 namespace SDS
 {
 
-	enum class SDSMenuType : int
-	{
-		kClassMenu,
-		kClassCreationMenu,
-		kBonfireLevelupMenu,
-		kIconbasedInventoryMenu
-	};
-
 	enum class SDSFocus : int
 	{
 		kCombat = 1,
 		kMagick = 2,
-		kStealth = 3
+		kStealth = 3,
+		kNone = 4
 	};
+
+	const char* SDSFocusToString(SDSFocus a_focus);
+	SDSFocus SDSFocusByName(const char* a_name);
 
 	enum class SDSAttribute : int
 	{
@@ -28,8 +24,58 @@ namespace SDS
 		kEndurance = 6,
 		kPersonality = 7,
 		kLuck = 8,
-		kFaith = 9
+		kFaith = 9,
+		kNone = 10
 	};
+
+	struct SDSLeveledValue
+	{
+		RE::ActorValue av;
+		std::map<int, float> leveledValues;
+		const char* name;
+		uint16_t perkEntryIndex;
+
+		SDSLeveledValue(const RE::ActorValue& a_av, const char* a_name) :
+			av(a_av), name(a_name), perkEntryIndex(0)
+		{
+		}
+
+		float GetClosest(int playerLevel);
+	};
+
+	struct SDSLeveledAttribute
+	{
+		SDSAttribute attribute;
+		std::vector<SDSLeveledValue> actorValues;
+		const char* name;
+		RE::BGSPerk* perkEntry;
+		std::map<RE::FormID, int> racialBonuses;
+
+		SDSLeveledAttribute(const SDSAttribute& attr) :
+			attribute(attr)
+		{
+			name = SDSLeveledAttribute::NameByAttribute(attr);
+			racialBonuses = {
+				// Argonian, Breton, Dark Elf, High Elf, Imperial
+				{ 0x13740, 0 }, { 0x13741, 0 }, { 0x13742, 0 }, { 0x13743, 0 }, { 0x13744, 0 },
+				// Khajiit, Nord, Orc, Redguard, Wood Elf
+				{ 0x13745, 0 }, { 0x13746, 0 }, { 0x13747, 0 }, { 0x13748, 0 }, { 0x13749, 0 }
+			};
+		}
+
+		void ToGFxValue(int multiplier, int playerLevel, RE::GFxValue* value);
+		float GetAttributePerkFunctionValue(SDSLeveledValue* val);
+
+		RE::ActorValue GetAccociatedActorValue();
+
+		float GetBaseActorValue();
+		void SetBaseActorValue(float val);
+		void IncrementAttribute(float val);
+
+		static const char* NameByAttribute(SDSAttribute attr);
+	};
+
+	SDSAttribute SDSAttributeByName(const char* attr_name);
 
 	enum class InventoryDefine : int
 	{
@@ -52,11 +98,6 @@ namespace SDS
 		kHousePart = 16
 	};
 
-	/*
-	|  6   |  7  |   8   |   9   |   10  |   11  |   12  |  13  |  14  |   15  |  16  |   17   |  18 |  19  |  20  |  21 |  22  |  23  |
-	|  1h  |  2h | marks | block | smith | heavy | light | pick | lock | sneak | alch | speech | alt | conj | dest | ill | rest | ench |
-	*/
-
 	struct PlayerData
 	{
 		std::string SelectedSpecializationID;
@@ -71,7 +112,5 @@ namespace SDS
 			SelectedSpecializationID = "";
 			RemainingSkillPoints = 0;
 		};
-
-		static uint32_t GetGeneratedAV([[maybe_unused]] SDSAttribute AVName) { return 0; };
 	};
 }

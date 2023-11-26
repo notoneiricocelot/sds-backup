@@ -5,5 +5,5 @@ $strings = @('czech', 'english', 'french', 'german', 'italian', 'japanese', 'pol
 
 ForEach ($string in $strings)
 {
-    Copy-Item "SDS_english.txt" -Destination "$outDir\SDS_$string.txt"
+    Copy-Item "sds_interfaces_english.txt" -Destination "$outDir\SDS_$string.txt"
 }

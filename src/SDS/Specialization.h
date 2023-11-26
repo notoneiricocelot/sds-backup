@@ -34,13 +34,7 @@ namespace SDS
 		SDSAttribute GetFirstAttribute() const { return firstAttribute; }
 
 		SDSAttribute GetSecondAttribute() const { return secondAttribute; }
-
-		int* GetSkills() { return skills; }
-
-		void SetSkillFocus(int avID, int pos)
-		{
-			skills[pos] = avID;
-		}
+		int skills[6];
 
 		void ToGfxValue(RE::GFxValue* val, RE::GPtr<RE::GFxMovieView> uiMovie);
 
@@ -55,7 +49,6 @@ namespace SDS
 		SDSFocus focus;
 		SDSAttribute firstAttribute;
 		SDSAttribute secondAttribute;
-		int skills[6];
 	};
 
 }

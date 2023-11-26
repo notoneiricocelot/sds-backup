@@ -29,10 +29,13 @@ namespace
 		*path += L".log";
 
 		std::shared_ptr<spdlog::logger> log;
-		if (IsDebuggerPresent()) {
+		if (IsDebuggerPresent())
+		{
 			log = std::make_shared<spdlog::logger>(
 				"Global", std::make_shared<spdlog::sinks::msvc_sink_mt>());
-		} else {
+		}
+		else
+		{
 			log = std::make_shared<spdlog::logger>(
 				"Global", std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true));
 		}
@@ -89,9 +92,12 @@ namespace
 	{
 		// RE::BSScript
 		SKSE::log::trace("Initializing Papyrus binding...");
-		if (SKSE::GetPapyrusInterface()->Register(SDS::SDSInterface::Register)) {
+		if (SKSE::GetPapyrusInterface()->Register(SDS::SDSInterface::Register))
+		{
 			SKSE::log::debug("Papyrus functions bound.");
-		} else {
+		}
+		else
+		{
 			SKSE::stl::report_and_fail("Failure to register Papyrus bindings.");
 		}
 	}
@@ -122,7 +128,7 @@ namespace
 		// The trampoline pointed to contains any instructions from the original function we overwrote and a call to the
 		// instruction that comes after, so that if we call that address as a function, we are in effect calling the
 		// original code.
-
+		SDS::CoreHooks::Hook();
 		SDS::HUDHooks::Hook();
 		SKSE::log::debug("Hooks initialized.");
 	}
@@ -154,7 +160,8 @@ namespace
 	 */
 	void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 	{
-		switch (a_msg->type) {
+		switch (a_msg->type)
+		{
 		// Skyrim lifecycle events.
 		// Called after all plugins have finished running SKSEPlugin_Load.
 		// It is now safe to do multithreaded operations, or operations against other plugins.
@@ -182,6 +189,7 @@ namespace
 		case SKSE::MessagingInterface::kPreLoadGame:
 		// Data will be the name of the loaded save.
 		// Player's selected save game has finished loading.
+			break;
 		case SKSE::MessagingInterface::kPostLoadGame:
 		// Data will be a boolean indicating whether the load was successful.
 			SDS::Settings::OnPostLoadGame();
@@ -202,13 +210,15 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	a_info->name = Plugin::NAME.data();
 	a_info->version = Plugin::VERSION[0];
 
-	if (a_skse->IsEditor()) {
+	if (a_skse->IsEditor())
+	{
 		logger::critical("Loaded in editor, marking as incompatible"sv);
 		return false;
 	}
 
 	const auto ver = a_skse->RuntimeVersion();
-	if (ver < SKSE::RUNTIME_SSE_1_5_39) {
+	if (ver < SKSE::RUNTIME_SSE_1_5_39)
+	{
 		logger::critical(FMT_STRING("Unsupported runtime version {}"), ver.string());
 		return false;
 	}
@@ -251,7 +261,8 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	SKSE::AllocTrampoline(static_cast<int64_t>(1 << 8));
 
 	auto messaging = SKSE::GetMessagingInterface();
-	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
+	if (!messaging->RegisterListener("SKSE", MessageHandler))
+	{
 		return false;
 	}
 

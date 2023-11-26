@@ -2,6 +2,19 @@
 
 namespace SDS
 {
+
+	class LevelUpMenuHandler
+	{
+		public:
+			static void OnMenuChange(bool isOpening);
+	};
+
+	class RaceMenuHandler
+	{
+		public:
+			static void OnMenuChange(bool isOpening);
+	};
+
 	/**
 	 *
 	 * <p>
@@ -20,6 +33,7 @@ namespace SDS
 		public:
 			/**
 			 * Get the singleton instance of the <code>SDSInterface</code>.
+			 * copy-pasted from Commonlib
 			 */
 			static SDSScaleform* GetSingleton()
 			{

@@ -1,0 +1,111 @@
+$Acrobat	Acrobat
+$AcrobatDesc	The kind of person that uses agility and endurance to their advantage. Unafraid of jumping long distances.
+$Agent	Agent
+$AgentDesc	Charming when they can be seen, and nearly invisible when in shadow.
+$Archer	Archer
+$ArcherDesc	A marksman, adept at combat at great distances. Able to take down most foes before they have a chance to draw sword.
+$Assassin	Assassin
+$AssassinDesc	Nimble and quiet, they move in darkness to strike at the unsuspecting. Locks hold no doors shut for them.
+$Barbarian	Barbarian
+$BarbarianDesc	Fearsome brutes who inspire fear and dread in the hearts of their enemies. Like a storm, swift and powerful. Finding little use for heavy armor, they rely on smashing their foes into the ground.
+$Bard	Bard
+$BardDesc	Intelligent and personable, they prefer to accomplish tasks with their words first, and sword second.
+$Battlemage	Battlemage
+$BattlemageDesc	Able to resolve most conflicts with either spell or sword. They are a deadly mix of scholar and soldier.
+$Crusader	Crusader
+$CrusaderDesc	A combatant who wields the power of brute strength and medicinal knowledge. Cheating death after every fight, they rely on their keen knowledge of restoration to fight yet again.
+$Healer	Healer
+$HealerDesc	Fighters of poison and illness. The ancient art of restoration is their ally, and the deadly art of destruction is their weapon.
+$Knight	Knight
+$KnightDesc	The most noble of all combatants. Strong in body and in character.
+$Mage	Mage
+$MageDesc	Prefering to use their extensive knowledge of all things magical, they wield a might more powerful than the sharpest blade.
+$Monk	Monk
+$MonkDesc	Quick and cunning with the empty hand, they are strong in spirit. They prefer to solve conflict by arrow or by fist.
+$Nightblade	Nightblade
+$NightbladeDesc	Spell and shadow are their friends. By darkness they move with haste, casting magic to benefit their circumstances.
+$Pilgrim	Pilgrim
+$PilgrimDesc	Hearty folk, well-versed in the tomes of old. They profit in life by bartering in the market, or by persuading the weak-minded.
+$Rogue	Rogue
+$RogueDesc	They use speed in combat rather than brute force. Persuasive in conversation, their tongues are as sharp as blades.
+$Scout	Scout
+$ScoutDesc	Preferring the rolling countryside to the city life, they are gifted with the ability to evade, guard, and protect themselves with great proficiency.
+$Sorcerer	Sorcerer
+$SorcererDesc	Besting the most well-equipped fighters, they rely on the spells of the mystic arts. Unique to these mages is the bodily stamina to be armed with the thickest armor.
+$Spellsword	Spellsword
+$SpellswordDesc	More nimble and athletic than the sorcerer, and better suited for spell-casting than the knight, their attacks are unpredictable. Students of combat and magic.
+$Thief	Thief
+$ThiefDesc	Profiting from the losses of others is their love. Able to be swift in shadow, and crafty in bartering. Locks are enemies, and lock-picks are their swords.
+$Warrior	Warrior
+$WarriorDesc	Unafraid of light weaponry, they plow into the fray with little regard for injury. Masters of all melee tools, they put little faith in the magical arts.
+$Witchhunter	Witchhunter
+$WitchhunterDesc	Swift on foot, and clever with spells, they use distance as their ally. Slower adversaries are fodder for their arrows.
+$FocusCombat	Combat
+$FocusMagic	Magic
+$FocusStealth	Stealth
+$SpecFocus	Specialization
+$SpecAttribs	Attributes
+$AttrStrength	Strength
+$AttrIntelligence	Intelligence
+$AttrWillpower	Willpower
+$AttrAgility	Agility
+$AttrSpeed	Speed
+$AttrEndurance	Endurance
+$AttrPersonality	Personality
+$AttrLuck	Luck
+$AttrFaith	Faith
+$MajorSkills	Major Skills
+$specCustom	Custom Class
+$sdsClass	Class
+$equipLoad	Equip Load
+$sdsClassMenuSelect	Create your character
+$sdsClassMenuTitle	Class Selection
+$skOne	One-Handed
+$skTwo	Two-Handed
+$skArch	Marksman
+$skBlock	Block
+$skSmith	Smithing
+$skHeavy	Heavy armor
+$skLight	Light armor
+$skPick	Pickpocketing
+$skLock	Lockpicking
+$skSneak	Sneak
+$skAlch	Alchemy
+$skSpeech	Speechcraft
+$skAlter	Alteration
+$skConj	Conjuration
+$skDestr	Destruction
+$skIll	Illusion
+$skRes	Restoration
+$skEnch	Enchanting
+$sdsSkills	Skills
+$sdsConfirm	Confirm
+$sdsSkillPoints	Skill Points
+$sdsLevelUpMenu	Level Up
+$sdsInventoryMenu	Inventory
+$cardBasePowers	Base Power
+$cardDefense	Defense
+$cardResistances	Resistances
+$DefMagicRes	Magic
+$DefDiseaseRes	Disease
+$DefFireRes	Fire
+$DefFrostRes	Frost
+$DefShockRes	Shock
+$DefPoisonRes	Poison
+$BaseCarryInfo	Carry Weight
+$BaseStaminaRate	Stamina Regeneration
+$BaseMagickaRate	Magicka Regeneration
+$BaseSpellMastery	Spell Mastery
+$SDSConfirmLevelUp	Are you sure?
+$SDSLevelupTooltip	Choose skills and attributes to levelup
+$FinalizeCreation	Finalize creation
+$EntryIncomplete	Entry Incomplete
+$Appearance	Appearance
+$sdsCreateCharacter	Create Character
+$EnterName	Enter name
+$SelectClass	Select class
+$ChooseRace	Choose race
+$SelectGender	Select gender
+$ChangeAppearance	Change appearance
+$ChangeCamera	Camera position
+$LoadPreset	Load Character Preset

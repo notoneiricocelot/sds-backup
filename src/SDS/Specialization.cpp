@@ -14,17 +14,19 @@ namespace SDS
 		val->SetMember("attr1", RE::GFxValue(static_cast<int>(firstAttribute)));
 		val->SetMember("attr2", RE::GFxValue(static_cast<int>(secondAttribute)));
 
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 6; i++)
+		{
 			s.PushBack(skills[i]);
 		}
 		val->SetMember("skills", s);
 	}
+
 	int Specialization::Find(std::string id)
 	{
 		int i = 0;
-		for (auto const& it : Specializations) {
-			// return 0 if equal
-			if (!it->GetID().compare(id))
+		for (auto const& it : Specializations)
+		{
+			if (it->GetID().compare(id) == 0)
 				return i;
 			i += 1;
 		}

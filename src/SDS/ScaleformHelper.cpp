@@ -61,10 +61,10 @@ namespace SDS
 	void ScaleformHelper::GetActorBaseAVs(RE::GFxValue* av_list)
 	{
 		auto player = RE::PlayerCharacter::GetSingleton();
-		auto actorValueOwner = player->AsActorValueOwner();
 
-		for (AV i = AV::kAggression; i <= AV::kReflectDamage;) {
-			av_list->PushBack(static_cast<int>(actorValueOwner->GetBaseActorValue(i)));
+		for (AV i = AV::kAggression; i <= AV::kReflectDamage;)
+		{
+			av_list->PushBack(RE::GFxValue(player->GetBaseActorValue(i)));
 
 			i = static_cast<AV>(static_cast<int>(i) + 1);
 		}
@@ -79,15 +79,19 @@ namespace SDS
 		RE::RACE_DATA::SkillBoost* boost = nullptr;
 		auto skillBoosts = player->GetRace()->data.skillBoosts;
 
-		for (AV i = AV::kOneHanded; i <= AV::kEnchanting;) {
+		for (AV i = AV::kOneHanded; i <= AV::kEnchanting;)
+		{
 			av_skills->PushBack(baseCap);
 			i = static_cast<AV>(static_cast<int>(i) + 1);
 		}
 
-		if (Settings::bUseRacialCaps_Experience) {
-			for (int i = 0; i < RE::RACE_DATA::kNumSkillBoosts; i++) {
+		if (Settings::bUseRacialCaps_Experience)
+		{
+			for (int i = 0; i < RE::RACE_DATA::kNumSkillBoosts; i++)
+			{
 				boost = &skillBoosts[i];
-				if (boost) {
+				if (boost)
+				{
 					racialBoostIndex = static_cast<int>(boost->skill.get()) - 6;
 					av_skills->SetElement(racialBoostIndex, baseCap + boost->bonus);
 				}
@@ -95,11 +99,33 @@ namespace SDS
 		}
 	}
 
+	/**
+	* Use to get all Attribute perk values with multiplied by attribute level
+	@perkValues GFxValue object
+	*/
+	void ScaleformHelper::GetPlayerPerkValues(RE::GFxValue* perkValues)
+	{
+		const uint8_t efficiencyBase = 0;
+		double newValue = 0.00;
+
+		for (auto it = Settings::LevelingSettings.begin(); it < Settings::LevelingSettings.end(); it++)
+		{
+			for (auto avIt = it->actorValues.begin(); avIt < it->actorValues.end(); avIt++)
+			{
+				if (avIt->av == RE::ActorValue::kNone)
+				{
+					newValue = efficiencyBase + it->GetAttributePerkFunctionValue(avIt._Ptr);
+					perkValues->SetMember(avIt->name, RE::GFxValue(newValue));
+				}
+			}
+		}
+	}
+
 	void ScaleformHelper::GetAttributes(RE::GFxValue* attributes)
 	{
-		for (SDSAttribute a = SDSAttribute::kStrength; a < SDSAttribute::kFaith;) {
-			attributes->PushBack(PlayerData::GetGeneratedAV(a));
-			a = static_cast<SDSAttribute>(static_cast<int>(a) + 1);
+		for (auto it = Settings::LevelingSettings.begin(); it < Settings::LevelingSettings.end(); it++)
+		{
+			attributes->PushBack(RE::GFxValue(static_cast<int>(it->attribute)));
 		}
 	}
 }

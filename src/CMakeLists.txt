@@ -3,6 +3,7 @@ set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 set(SOURCE_DIR "${ROOT_DIR}/src")
 set(SOURCE_FILES
 	"${SOURCE_DIR}/SDS/Main.cpp"
+	"${SOURCE_DIR}/SDS/Common.cpp"
 	"${SOURCE_DIR}/SDS/Common.h"
 	"${SOURCE_DIR}/SDS/Specialization.h"
 	"${SOURCE_DIR}/SDS/Specialization.cpp"
@@ -12,10 +13,6 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/SDS/Scaleform.h"
 	"${SOURCE_DIR}/SDS/ScaleformHelper.cpp"
 	"${SOURCE_DIR}/SDS/ScaleformHelper.h"
-	"${SOURCE_DIR}/SDS/ClassMenu.cpp"
-	"${SOURCE_DIR}/SDS/ClassMenu.h"
-	"${SOURCE_DIR}/SDS/LevelUp.cpp"
-	"${SOURCE_DIR}/SDS/LevelUp.h"
 	"${SOURCE_DIR}/SDS/Hooks.cpp"
 	"${SOURCE_DIR}/SDS/Hooks.h"
 	"${SOURCE_DIR}/SDS/Settings.cpp"
@@ -68,9 +65,11 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 			"/Zc:preprocessor"	# Enable preprocessor conformance mode
 
 			"/wd4200" # nonstandard extension used : zero-sized array in struct/union
+			"/DUNICODE"
+			"/D_UNICODE"
 
 			"$<$<CONFIG:DEBUG>:>"
-			"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC-;/Ob3>"
+			"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC-;/Ob2>"
 	)
 
 	target_link_options(
@@ -80,6 +79,12 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 			"$<$<CONFIG:RELEASE>:/INCREMENTAL:NO;/OPT:REF;/OPT:ICF;/DEBUG:NONE>"
 	)
 endif()
+
+target_include_directories(
+	"${PROJECT_NAME}"
+	SYSTEM PRIVATE
+		"${CMAKE_SOURCE_DIR}/include"
+)
 
 target_include_directories(
 	"${PROJECT_NAME}"
@@ -99,7 +104,6 @@ target_link_libraries(
 	PRIVATE
 		CommonLibSSE::CommonLibSSE
 		toml11::toml11
-		xbyak::xbyak
 )
 
 target_precompile_headers(

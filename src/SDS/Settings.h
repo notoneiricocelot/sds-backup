@@ -20,7 +20,7 @@ namespace SDS
 		static inline int selectedSpecIndex = -1;
 
 		/*
-			Sezialization ID
+			Sezialization ID for Save/Load serialization
 		*/
 		static inline const auto SpecializationRecord = _byteswap_ulong('SPEC');
 
@@ -37,6 +37,9 @@ namespace SDS
 		static inline int iSkillPointCost75 = 9;
 		static inline int iSkillPointsPerLevel = 15;
 		static inline int iSkillPointsCap = 45;
+		static inline int iBaseAttributeValue = 20;
+		static inline int iClassBaseAttributeBonus = 5;
+		static inline int iClassBaseSkillBonus = 5;
 
 		static inline float fSkillPointsLevelMultiplier = 1.5f;
 
@@ -79,8 +82,10 @@ namespace SDS
 			 */
 		static void OnGameLoaded(SKSE::SerializationInterface* serde);
 
-		static inline std::unique_ptr<PlayerData> Saved = std::make_unique<PlayerData>();
-		static inline std::mutex _lock;
+		static inline std::vector<SDSLeveledAttribute> LevelingSettings;
 
+		static inline std::unique_ptr<PlayerData> Saved = std::make_unique<PlayerData>();
+
+		static inline std::mutex _lock;
 	};
 }

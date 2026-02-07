@@ -6,6 +6,33 @@
 namespace SDS
 {
 
+	void ReadBoolSetting([[maybe_unused]] CSimpleIniA& a_ini, [[maybe_unused]] const char* a_sectionName, const char* a_settingName, bool& a_setting)
+	{
+		const char* bFound = nullptr;
+		bFound = a_ini.GetValue(a_sectionName, a_settingName);
+		if (bFound) {
+			a_setting = a_ini.GetBoolValue(a_sectionName, a_settingName);
+		}
+	}
+
+	void ReadUInt32Setting([[maybe_unused]] CSimpleIniA& a_ini, [[maybe_unused]] const char* a_sectionName, const char* a_settingName, uint32_t& a_setting)
+	{
+		const char* bFound = nullptr;
+		bFound = a_ini.GetValue(a_sectionName, a_settingName);
+		if (bFound) {
+			a_setting = static_cast<uint32_t>(a_ini.GetLongValue(a_sectionName, a_settingName));
+		}
+	}
+
+	void ReadFloatSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, float& a_setting)
+	{
+		const char* bFound = nullptr;
+		bFound = a_ini.GetValue(a_sectionName, a_settingName);
+		if (a_settingName) {
+			a_setting = static_cast<float>(a_ini.GetDoubleValue(a_sectionName, a_settingName));
+		}
+	}
+
 	void ReadTomlConfig(std::string path)
 	{
 		SKSE::log::info("Reading {}", path);
@@ -27,6 +54,7 @@ namespace SDS
 
 				Specialization::Specializations.push_back(std::make_unique<Specialization>(ID, fmt::format("${}", ID), description, focus, a1, a2));
 				Specialization* spec = Specialization::Specializations.back().get();
+				spec->equipment = toml::find<toml::string>(c, "equipment");
 
 				std::vector<int> skills = toml::find<std::vector<int>>(c, "skills");
 				for (i = 0; i < skills.size(); i++)
@@ -36,6 +64,10 @@ namespace SDS
 			}
 
 			classes.clear();
+
+			toml::value generalSettings = toml::find<toml::value>(data, "generalSettings");
+			Settings::bDebugEnabled = static_cast<bool>(toml::find<toml::integer>(generalSettings, "bDebugEnabled"));
+			Settings::iLogLevel = static_cast<int>(toml::find<toml::integer>(generalSettings, "iLogLevel"));
 
 			SKSE::log::info("{} classes loaded, processing leveling settings", Specialization::Specializations.size());
 
@@ -50,14 +82,16 @@ namespace SDS
 			Settings::iSkillPointCost75 = static_cast<int>(toml::find<toml::integer>(levelingSettings, "iSkillPointCost75"));
 
 			Settings::iSkillPointsPerLevel = static_cast<int>(toml::find<toml::integer>(levelingSettings, "iSkillPointsPerLevel"));
+			Settings::iAttributePointsPerLevel = static_cast<int>(toml::find<toml::integer>(levelingSettings, "iAttributePointsPerLevel"));
+
 			Settings::iSkillPointsCap = static_cast<int>(toml::find<toml::integer>(levelingSettings, "iSkillPointsCap"));
 			Settings::fSkillPointsLevelMultiplier = static_cast<float>(toml::find(levelingSettings, "fSkillPointsLevelMultiplier").as_floating(std::nothrow));
 
 			Settings::iBaseAttributeValue = static_cast<int>(toml::find<toml::integer>(levelingSettings, "iBaseAttributeValue"));
 			Settings::iClassBaseAttributeBonus = static_cast<int>(toml::find<toml::integer>(levelingSettings, "iClassBaseAttributeBonus"));
-			Settings::iClassBaseSkillBonus = static_cast<int>(toml::find<toml::integer>(levelingSettings, "iClassBaseSkillBonus"));
+			Settings::iClassBaseSkillBonus = static_cast<int8_t>(toml::find<toml::integer>(levelingSettings, "iClassBaseSkillBonus"));
 
-			Settings::bSSLDebugEnabled = static_cast<bool>(toml::find<toml::integer>(levelingSettings, "bSSLDebugEnabled"));
+			Settings::iAttributeCap = static_cast<int>(toml::find<toml::integer>(levelingSettings, "iAttributeCap"));
 
 			assert(Settings::iSkillPointsPerLevel > 0);
 			SKSE::log::info("Leveling settings loaded, processing racial bonuses");
@@ -92,7 +126,7 @@ namespace SDS
 
 				for (auto avIt = it->actorValues.begin(); avIt < it->actorValues.end(); avIt++)
 				{
-					if (Settings::bSSLDebugEnabled)
+					if (Settings::bDebugEnabled)
 						SKSE::log::info("Processing subtable: {}.{}", it->name, avIt->name);
 
 					// parsing subtables for level depended attributes
@@ -106,7 +140,7 @@ namespace SDS
 							avIt->leveledValues.insert({ leveledKey, leveledValue });
 						}
 					}
-					else if (Settings::bSSLDebugEnabled)
+					else if (Settings::bDebugEnabled && avIt->av != RE::ActorValue::kNone)
 						SKSE::log::info("Subtable: {}.{} not found", it->name, avIt->name);
 				}
 			}
@@ -128,43 +162,43 @@ namespace SDS
 	{
 		// Setup leveling settings struct
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kStrength);
-		Settings::LevelingSettings[0].actorValues.emplace_back(RE::ActorValue::kNone, "twohandedDamage");
-		Settings::LevelingSettings[0].actorValues.emplace_back(RE::ActorValue::kResistFire, "fire");
-		Settings::LevelingSettings[0].actorValues.emplace_back(RE::ActorValue::kResistShock, "shock");
-		Settings::LevelingSettings[0].actorValues.emplace_back(RE::ActorValue::kCarryWeight, "carryWeight");
+		Settings::LevelingSettings[0].actorValues.emplace_back(RE::ActorValue::kNone, "TwohandedDamage");
+		Settings::LevelingSettings[0].actorValues.emplace_back(RE::ActorValue::kResistFire, "FireResist");
+		Settings::LevelingSettings[0].actorValues.emplace_back(RE::ActorValue::kResistShock, "ElectricResist");
+		Settings::LevelingSettings[0].actorValues.emplace_back(RE::ActorValue::kCarryWeight, "CarryWeight");
 
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kIntelligence);
-		Settings::LevelingSettings[1].actorValues.emplace_back(RE::ActorValue::kNone, "spellPower");
-		Settings::LevelingSettings[1].actorValues.emplace_back(RE::ActorValue::kNone, "spellDuration");
+		Settings::LevelingSettings[1].actorValues.emplace_back(RE::ActorValue::kNone, "SpellPower");
+		Settings::LevelingSettings[1].actorValues.emplace_back(RE::ActorValue::kNone, "SpellDuration");
 
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kWillpower);
-		Settings::LevelingSettings[2].actorValues.emplace_back(RE::ActorValue::kMagicka, "magicka");
-		Settings::LevelingSettings[2].actorValues.emplace_back(RE::ActorValue::kResistMagic, "magick");
-		Settings::LevelingSettings[2].actorValues.emplace_back(RE::ActorValue::kMagickaRateMult, "magickaRate");
+		Settings::LevelingSettings[2].actorValues.emplace_back(RE::ActorValue::kMagicka, "Magicka");
+		Settings::LevelingSettings[2].actorValues.emplace_back(RE::ActorValue::kResistMagic, "MagicResist");
+		Settings::LevelingSettings[2].actorValues.emplace_back(RE::ActorValue::kMagickaRateMult, "MagickaRateMult");
 
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kAgility);
-		Settings::LevelingSettings[3].actorValues.emplace_back(RE::ActorValue::kNone, "onehandedDamage");
-		Settings::LevelingSettings[3].actorValues.emplace_back(RE::ActorValue::kPoisonResist, "poison");
-		Settings::LevelingSettings[3].actorValues.emplace_back(RE::ActorValue::kCarryWeight, "carryWeight");
+		Settings::LevelingSettings[3].actorValues.emplace_back(RE::ActorValue::kNone, "OnehandedDamage");
+		Settings::LevelingSettings[3].actorValues.emplace_back(RE::ActorValue::kPoisonResist, "PoisonResist");
+		Settings::LevelingSettings[3].actorValues.emplace_back(RE::ActorValue::kCarryWeight, "CarryWeight");
 
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kSpeed);
-		Settings::LevelingSettings[4].actorValues.emplace_back(RE::ActorValue::kStamina, "stamina");
-		Settings::LevelingSettings[4].actorValues.emplace_back(RE::ActorValue::kNone, "marksmanDamage");
+		Settings::LevelingSettings[4].actorValues.emplace_back(RE::ActorValue::kStamina, "Stamina");
+		Settings::LevelingSettings[4].actorValues.emplace_back(RE::ActorValue::kNone, "MarksmanDamage");
 
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kEndurance);
-		Settings::LevelingSettings[5].actorValues.emplace_back(RE::ActorValue::kHealth, "health");
-		Settings::LevelingSettings[5].actorValues.emplace_back(RE::ActorValue::kResistFrost, "frost");
-		Settings::LevelingSettings[5].actorValues.emplace_back(RE::ActorValue::kResistDisease, "disease");
-		Settings::LevelingSettings[5].actorValues.emplace_back(RE::ActorValue::kCarryWeight, "carryWeight");
+		Settings::LevelingSettings[5].actorValues.emplace_back(RE::ActorValue::kHealth, "Health");
+		Settings::LevelingSettings[5].actorValues.emplace_back(RE::ActorValue::kResistFrost, "FrostResist");
+		Settings::LevelingSettings[5].actorValues.emplace_back(RE::ActorValue::kResistDisease, "DiseaseResist");
+		Settings::LevelingSettings[5].actorValues.emplace_back(RE::ActorValue::kCarryWeight, "CarryWeight");
 
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kPersonality);
-		Settings::LevelingSettings[6].actorValues.emplace_back(RE::ActorValue::kDamageResist, "armor");
-		Settings::LevelingSettings[6].actorValues.emplace_back(RE::ActorValue::kStaminaRateMult, "staminaRate");
+		Settings::LevelingSettings[6].actorValues.emplace_back(RE::ActorValue::kDamageResist, "DamageResist");
+		Settings::LevelingSettings[6].actorValues.emplace_back(RE::ActorValue::kStaminaRateMult, "StaminaRateMult");
 
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kLuck);
-		Settings::LevelingSettings[7].actorValues.emplace_back(RE::ActorValue::kNone, "abundance");
+		Settings::LevelingSettings[7].actorValues.emplace_back(RE::ActorValue::kNone, "Abundance");
 		Settings::LevelingSettings.emplace_back(SDSAttribute::kFaith);
-		Settings::LevelingSettings[8].actorValues.emplace_back(RE::ActorValue::kNone, "equipmentPower");
+		Settings::LevelingSettings[8].actorValues.emplace_back(RE::ActorValue::kNone, "EquipmentPower");
 
 		auto dataHandler = RE::TESDataHandler::GetSingleton();
 		if (dataHandler)
@@ -195,6 +229,7 @@ namespace SDS
 		const std::string dataPath("Data/SKSE/Plugins/SDS.toml");
 
 		constexpr const wchar_t* experienceIniPath = L"Data/SKSE/Plugins/Experience.ini";
+		constexpr const wchar_t* uncapperIniPath = L"Data/SKSE/Plugins/SkyrimUncapper.ini";
 
 		// Experience INI Settings
 		const auto readExperienceIni = [&](std::filesystem::path path)
@@ -211,8 +246,18 @@ namespace SDS
 			ReadBoolSetting(experienceIni, "General", "bUseRacialCaps", bUseRacialCaps_Experience);
 		};
 
+		const auto readUncapperIni = [&](std::filesystem::path path)
+		{
+			CSimpleIniA uncapperIni;
+			uncapperIni.SetUnicode();
+			uncapperIni.LoadFile(path.string().c_str());
+
+			ReadUInt32Setting(uncapperIni, "SkillCaps", "iAlchemy", (uint32_t&)iMaxSkillLevel_Uncapper);
+		};
+
 		ReadTomlConfig(dataPath);
 		readExperienceIni(experienceIniPath);
+		readUncapperIni(uncapperIniPath);
 	}
 
 	void Settings::OnPostLoadGame()
@@ -230,42 +275,15 @@ namespace SDS
 		}
 	}
 
-	void Settings::ReadBoolSetting([[maybe_unused]] CSimpleIniA& a_ini, [[maybe_unused]] const char* a_sectionName, const char* a_settingName, bool& a_setting)
-	{
-		const char* bFound = nullptr;
-		bFound = a_ini.GetValue(a_sectionName, a_settingName);
-		if (bFound)
-		{
-			a_setting = a_ini.GetBoolValue(a_sectionName, a_settingName);
-		}
-	}
-
-	void Settings::ReadUInt32Setting([[maybe_unused]] CSimpleIniA& a_ini, [[maybe_unused]] const char* a_sectionName, const char* a_settingName, uint32_t& a_setting)
-	{
-		const char* bFound = nullptr;
-		bFound = a_ini.GetValue(a_sectionName, a_settingName);
-		if (bFound)
-		{
-			a_setting = static_cast<uint32_t>(a_ini.GetLongValue(a_sectionName, a_settingName));
-		}
-	}
-
-	void Settings::ReadFloatSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, float& a_setting)
-	{
-		const char* bFound = nullptr;
-		bFound = a_ini.GetValue(a_sectionName, a_settingName);
-		if (a_settingName)
-		{
-			a_setting = static_cast<float>(a_ini.GetDoubleValue(a_sectionName, a_settingName));
-		}
-	}
-
 	void Settings::OnRevert([[maybe_unused]] SKSE::SerializationInterface* serde)
 	{
 		std::unique_lock lock(_lock);
 
 		Settings::Saved->SelectedSpecializationID = "";
 		Settings::Saved->RemainingSkillPoints = 0;
+		Settings::Saved->CombatSkillPoints = 0;
+		Settings::Saved->StealthSkillPoints = 0;
+		Settings::Saved->MagicSkillPoints = 0;
 	}
 
 	void Settings::OnGameLoaded(SKSE::SerializationInterface* serde)
@@ -275,18 +293,17 @@ namespace SDS
 		std::uint32_t type = 0;
 		std::uint32_t size = 0;
 		std::uint32_t version = 0;
-		// To load records from a cosave, use <code>GetNextRecordInfo</code> to iterate from one record to the next.
-		// You will be given records in the order they were written, but otherwise you do not look up a record by its name.
-		// Instead check the result of each iteration to find out which record it is and handle it appropriately.
-		//
-		// If you make breaking changes to your data format, you can increase the version number used when writing the data
-		// out and check that number here to handle previous versions.
+
 		while (serde->GetNextRecordInfo(type, version, size))
 		{
 			if (type == SpecializationRecord)
 			{
 				serde->ReadRecordData(&Settings::Saved->SelectedSpecializationID, sizeof(Settings::Saved->SelectedSpecializationID));
 				serde->ReadRecordData(&Settings::Saved->RemainingSkillPoints, sizeof(Settings::Saved->RemainingSkillPoints));
+
+				serde->ReadRecordData(&Settings::Saved->CombatSkillPoints, sizeof(Settings::Saved->CombatSkillPoints));
+				serde->ReadRecordData(&Settings::Saved->StealthSkillPoints, sizeof(Settings::Saved->StealthSkillPoints));
+				serde->ReadRecordData(&Settings::Saved->MagicSkillPoints, sizeof(Settings::Saved->MagicSkillPoints));
 			}
 		}
 		SKSE::log::info("Config loaded, class: {}, remaining skillPoints: {}", Settings::Saved->SelectedSpecializationID, Settings::Saved->RemainingSkillPoints);
@@ -296,9 +313,6 @@ namespace SDS
 	{
 		std::unique_lock lock(_lock);
 
-		// To write data open a record with a given name. The name must be unique within your mod, and has a version number
-		// assigned (in this case 0). You can increase the version number if making breaking format change from a previous
-		// version of your mod, so that the load handler can know which version of the format is being used.
 		if (!serde->OpenRecord(SpecializationRecord, 0))
 		{
 			SKSE::log::error("Unable to open record to write cosave data.");
@@ -307,6 +321,10 @@ namespace SDS
 
 		serde->WriteRecordData(&Settings::Saved->SelectedSpecializationID, sizeof(Settings::Saved->SelectedSpecializationID));
 		serde->WriteRecordData(&Settings::Saved->RemainingSkillPoints, sizeof(Settings::Saved->RemainingSkillPoints));
+
+		serde->WriteRecordData(&Settings::Saved->CombatSkillPoints, sizeof(Settings::Saved->CombatSkillPoints));
+		serde->WriteRecordData(&Settings::Saved->StealthSkillPoints, sizeof(Settings::Saved->StealthSkillPoints));
+		serde->WriteRecordData(&Settings::Saved->MagicSkillPoints, sizeof(Settings::Saved->MagicSkillPoints));
 	}
 
 }

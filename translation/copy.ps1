@@ -1,9 +1,9 @@
 # USER DEFINED
-$outDir = "SDS\Interface\Translations"
+$outDir = "Interface\Translations"
 
-$strings = @('czech', 'english', 'french', 'german', 'italian', 'japanese', 'polish', 'russian', 'spanish')
+$strings = @('english', 'russian')
 
 ForEach ($string in $strings)
 {
-    Copy-Item "sds_interfaces_english.txt" -Destination "$outDir\SDS_$string.txt"
+    Copy-Item "SDSInterface_$string.txt" -Destination "$outDir\SDSInterface_$string.txt"
 }

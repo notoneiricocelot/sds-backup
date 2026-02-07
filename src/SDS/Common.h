@@ -3,6 +3,12 @@
 namespace SDS
 {
 
+	template <class T>
+	T* GetTESFormFromSetting(std::string &confLine)
+	{
+		return RE::TESDataHandler::GetSingleton()->LookupForm<T>(std::stoi(confLine, nullptr, 16), confLine.substr(9));
+	}
+
 	enum class SDSFocus : int
 	{
 		kCombat = 1,
@@ -13,8 +19,9 @@ namespace SDS
 
 	const char* SDSFocusToString(SDSFocus a_focus);
 	SDSFocus SDSFocusByName(const char* a_name);
+	SDSFocus SDSFocusByAV(RE::ActorValue av);
 
-	enum class SDSAttribute : int
+	enum SDSAttribute : int
 	{
 		kStrength = 1,
 		kIntelligence = 2,
@@ -45,10 +52,16 @@ namespace SDS
 
 	struct SDSLeveledAttribute
 	{
+		// Core attribute this struct are represent
 		SDSAttribute attribute;
+		// List of actor values this struct are affect
 		std::vector<SDSLeveledValue> actorValues;
+		// String representation of attribute
 		const char* name;
+		// Perk entry if attribute have perk dependant on it
+		// TODO may be add list of perks
 		RE::BGSPerk* perkEntry;
+		// Additional starter racial bonuses
 		std::map<RE::FormID, int> racialBonuses;
 
 		SDSLeveledAttribute(const SDSAttribute& attr) :
@@ -63,14 +76,14 @@ namespace SDS
 			};
 		}
 
-		void ToGFxValue(int multiplier, int playerLevel, RE::GFxValue* value);
-		float GetAttributePerkFunctionValue(SDSLeveledValue* val);
+		void ToGFxValue(RE::Character* actor, int multiplier, int playerLevel, RE::GFxValue* value);
+		float GetAttributePerkFunctionValue(RE::Character*, SDSLeveledValue* val);
 
 		RE::ActorValue GetAccociatedActorValue();
 
-		float GetBaseActorValue();
-		void SetBaseActorValue(float val);
-		void IncrementAttribute(float val);
+		float GetBaseActorValue(RE::Character*);
+		void SetBaseActorValue(RE::Character*, float);
+		void IncrementAttribute(RE::Character*, float val);
 
 		static const char* NameByAttribute(SDSAttribute attr);
 	};
@@ -103,6 +116,10 @@ namespace SDS
 		std::string SelectedSpecializationID;
 		int RemainingSkillPoints;
 
+		int CombatSkillPoints;
+		int StealthSkillPoints;
+		int MagicSkillPoints;
+
 		PlayerData(const std::string& SelectedSpecializationID, int RemainingSkillPoints) :
 			SelectedSpecializationID(SelectedSpecializationID), RemainingSkillPoints(RemainingSkillPoints)
 		{
@@ -111,6 +128,10 @@ namespace SDS
 		PlayerData(){
 			SelectedSpecializationID = "";
 			RemainingSkillPoints = 0;
+
+			CombatSkillPoints = 0;
+			StealthSkillPoints = 0;
+			MagicSkillPoints = 0;
 		};
 	};
 }

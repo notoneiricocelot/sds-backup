@@ -2,7 +2,7 @@
 #include "Scaleform.h"
 #include "Settings.h"
 
-#include "Hooks.h"
+#include "HooksUI.h"
 
 #include <stddef.h>
 
@@ -128,7 +128,7 @@ namespace
 		// The trampoline pointed to contains any instructions from the original function we overwrote and a call to the
 		// instruction that comes after, so that if we call that address as a function, we are in effect calling the
 		// original code.
-		SDS::CoreHooks::Hook();
+		// SDS::CoreHooks::Hook();
 		SDS::HUDHooks::Hook();
 		SKSE::log::debug("Hooks initialized.");
 	}
@@ -258,7 +258,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	SKSE::log::info("{} {} is loading...", plugin->GetName(), version);
 
 	SKSE::Init(a_skse);
-	SKSE::AllocTrampoline(static_cast<int64_t>(1 << 8));
+	SKSE::AllocTrampoline(static_cast<int64_t>(1 << 6));
 
 	auto messaging = SKSE::GetMessagingInterface();
 	if (!messaging->RegisterListener("SKSE", MessageHandler))

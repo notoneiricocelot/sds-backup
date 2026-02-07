@@ -1,0 +1,180 @@
+## UI Sound event ID's
+
+	UIMenuBladeOpenSD
+	UIMenuFocus
+	UIMagicUnselect
+	UIMagicSelect
+	UIFavorite
+	UISelectOn
+	UISelectOff
+	UIAlchemyCreatePotion
+	UIAlchemyCreatePoison
+	UIAlchemyLearnEffect
+	UIEnchantingItemCreate
+	UIEnchantingItemDestroy
+	UIEnchantingLearnEffect
+	UIEnchantRecharge
+	UISmithingImproveArmor
+	UISmithingImproveWeapon
+	UISmithingCreateGeneric
+	UILockpickingEnter
+	UILockpickingPickBreak
+	UILockpickingPickMovement
+	UILockpickingUnlock
+	UILockpickingCylinderStop
+	UILockpickingCylinderTurn
+	UILockpickingCylinderSqueakA
+	UILockpickingCylinderSqueakB
+	UIShoutLearnAll
+	UIShoutLearnSingle
+	UISkillsTransitionUp
+	UISkillsStop
+	UISkillsGlow
+	UISkillsPerkSelect2D
+	UISkillsFocusSD
+	UISkillsFocus
+	UISkillsForward
+	UISkillsBackward
+	UIQuestActive
+	UIQuestInactive
+	UIJournalOpen
+
+	ITMPoisonUse
+	ITMNotePageTurn
+	ITMTorchHeldEquip
+
+# UI component props
+
+	buttonRenderer = "MappedButton";
+	maxButtons = 8;
+	buttonInitializer = {};
+	buttonInitializer.disableConstraints = false;
+	buttonInitializer.disabled = false;
+	buttonInitializer.disableFocus = true;
+	buttonInitializer.hiddenBackground = true;
+
+	desc = "$sdsClass";
+	avID = -1;
+	isSelectable = true;
+	enableInitCallback = true;
+	soundMap = [];
+	soundMap[0] = "click";
+	soundMap[1] = "focusIn";
+	soundMap[2] = "rollOut";
+	iconName = "thumb";
+	_align = "right";
+	valueEntryData = "-";
+	tabindex = 3;
+
+	textOption = "Shrink To Fit";
+	entryRenderer = "MeshListEntry";
+
+	offsetLeft = 12.5;
+	offsetRight = 10;
+	minimum = 0;
+	liveDragging = true;
+	maximum = 360;
+
+	iconSize = 13;
+	iconName = "SearchThumb";
+
+	textOption = "Shrink To Fit";
+	entryRenderer = "PopupSelectionEntry";
+	entryHeight = 30;
+	topBorder = 0;
+	bottomBorder = 0;
+	leftBorder = 0;
+	isPressOnMove = false;
+	canSelectDisabled = true;
+	rightBorder = 5;
+
+	disabled = false;
+	enableInitCallback = true;
+	inspectableScrollTarget = "\\\"\\\"";
+	offsetBottom = 0;
+	offsetTop = 0;
+	soundMap = {};
+	soundMap.theme = "default";
+	soundMap.scroll = "scroll";
+	trackMode = "scrollPage";
+	visible = false;
+
+	disabled = false;
+	enableInitCallback = true;
+	liveDragging = true;
+	maximum = 10;
+	minimum = 0;
+	offsetLeft = 5;
+	offsetRight = 28;
+	snapInterval = 1;
+	snapping = true;
+	soundMap = [];
+	soundMap[0] = "change";
+	value = 0;
+	visible = true;
+
+	buttonRenderer = "MappedButton";
+	maxButtons = 8;
+	buttonInitializer = {};
+	buttonInitializer.disableConstraints = false;
+	buttonInitializer.disabled = false;
+	buttonInitializer.disableFocus = true;
+	buttonInitializer.hiddenBackground = true;
+
+	disableConstraints = false
+	disabled = false
+	disableFocus = false
+	labelID = ""
+	toggle = false
+	visible = true
+	hiddenBackground = false
+	autoSize = none
+
+ObjectManager::forms[130] - BSGSoundCategories list
+
+0 - NPC Footsteps::NPC Footsteps
+1 - AudioCategorySFXFadeDuringDialogue::AudioCategorySFXFadeDuringDialogue
+2 - $Effects::$Effects
+3 - AudioCategoryPausedDuringMenuLoad::AudioCategoryPausedDuringMenuLoad
+4 - $Footsteps::$Footsteps
+5 - AudioCategoryMuteSubmerged::AudioCategoryMuteSubmerged
+6 - $Master::$Master
+7 - AudioCategoryNPCKillMove::AudioCategoryNPCKillMove
+8 - AudioCategoryPausedDuringMenu::AudioCategoryPausedDuringMenu
+9 - $AOS_Magic::$AOS_Magic
+10 - AudioCategoryPausedDuringMenuFade::AudioCategoryPausedDuringMenuFade
+11 - $Voice::$Voice
+12 - AudioCategoryNonVOC::AudioCategoryNonVOC
+13 - AudioCategoryVOC::AudioCategoryVOC
+14 - Ambience::Ambience
+15 - $Music::$Music
+16 - AudioCategoryAMBr::AudioCategoryAMBr
+17 - Menus::Menus
+18 - $FlowerGirls SFX::$FlowerGirls SFX
+19 - $Armor::$Armor
+20 - Weapons (ISC)::Weapons (ISC)
+21 - Horse Steps::Horse Steps
+22 - $Weapons::$Weapons
+23 - $AOS_Waterfalls::$AOS_Waterfalls
+
+To Translate:
+	Rebalance
+	KittyTail merge
+	Complete Alchemy Overhaul - rename all potions
+
+Plugins to remove:
+
+	StaticSkillLeveling
+	Levitation
+	STB Widgets
+	STB Active Effects
+	IWant Widgets
+	QuickLoot
+	Wheeler
+	Immersive Equipment Display
+	Character Suggestion
+	Oathvein UI startmenu.swf -> NordicUI
+
+
+RaceSexCamera start rotation: (4444.301 + -14712.798i + 5918.2573j + 0.13373484k)
+RaceSexCamera end rotation: (4448.003 + -14645.124i + 5918.2573j + 0.0867697k)

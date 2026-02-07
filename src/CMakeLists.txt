@@ -5,16 +5,30 @@ set(SOURCE_FILES
 	"${SOURCE_DIR}/SDS/Main.cpp"
 	"${SOURCE_DIR}/SDS/Common.cpp"
 	"${SOURCE_DIR}/SDS/Common.h"
-	"${SOURCE_DIR}/SDS/Specialization.h"
 	"${SOURCE_DIR}/SDS/Specialization.cpp"
+	"${SOURCE_DIR}/SDS/Specialization.h"
 	"${SOURCE_DIR}/SDS/Papyrus.cpp"
 	"${SOURCE_DIR}/SDS/Papyrus.h"
+	"${SOURCE_DIR}/SDS/HandlerAnimGraphs.cpp"
+	"${SOURCE_DIR}/SDS/HandlerAnimGraphs.h"
+	"${SOURCE_DIR}/SDS/HandlerLevelUpMenu.cpp"
+	"${SOURCE_DIR}/SDS/HandlerLevelUpMenu.h"
+	"${SOURCE_DIR}/SDS/HandlerRaceSexMenu.cpp"
+	"${SOURCE_DIR}/SDS/HandlerRaceSexMenu.h"
+	"${SOURCE_DIR}/SDS/HandlerTweenMenu.cpp"
+	"${SOURCE_DIR}/SDS/HandlerTweenMenu.h"
+	"${SOURCE_DIR}/SDS/BonfireMenu.cpp"
+	"${SOURCE_DIR}/SDS/BonfireMenu.h"
+	"${SOURCE_DIR}/SDS/EmoteMenu.cpp"
+	"${SOURCE_DIR}/SDS/EmoteMenu.h"
 	"${SOURCE_DIR}/SDS/Scaleform.cpp"
 	"${SOURCE_DIR}/SDS/Scaleform.h"
 	"${SOURCE_DIR}/SDS/ScaleformHelper.cpp"
 	"${SOURCE_DIR}/SDS/ScaleformHelper.h"
-	"${SOURCE_DIR}/SDS/Hooks.cpp"
-	"${SOURCE_DIR}/SDS/Hooks.h"
+	"${SOURCE_DIR}/SDS/HooksCore.cpp"
+	"${SOURCE_DIR}/SDS/HooksCore.h"
+	"${SOURCE_DIR}/SDS/HooksUI.cpp"
+	"${SOURCE_DIR}/SDS/HooksUI.h"
 	"${SOURCE_DIR}/SDS/Settings.cpp"
 	"${SOURCE_DIR}/SDS/Settings.h"
 	"${SOURCE_DIR}/SDS/PCH.h"
@@ -59,7 +73,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 		PRIVATE
 			"/sdl"	# Enable Additional Security Checks
 			"/utf-8"	# Set Source and Executable character sets to UTF-8
-			"/Zi"	# Debug Information Format
+			# "/Zi"	# Debug Information Format
 
 			"/permissive-"	# Standards conformance
 			"/Zc:preprocessor"	# Enable preprocessor conformance mode
@@ -94,7 +108,7 @@ target_include_directories(
 )
 
 set(SKSE_SUPPORT_XBYAK ON)
-add_subdirectory("$ENV{CommonLibSSEPath_NG}" CommonLibSSE EXCLUDE_FROM_ALL)
+add_subdirectory("$ENV{CommonLibSSEPath_NG}" CommonLibSSE SYSTEM EXCLUDE_FROM_ALL)
 
 find_package(xbyak REQUIRED CONFIG)
 find_package(toml11 REQUIRED CONFIG)
@@ -130,6 +144,18 @@ if("${COPY_OUTPUT}")
 		TARGET "${PROJECT_NAME}"
 		POST_BUILD
 		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${ROOT_DIR}/cmake/sds.toml" "${CompiledPluginsPath}/SKSE/Plugins/"
+		VERBATIM
+	)
+	add_custom_command(
+		TARGET "${PROJECT_NAME}"
+		POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${ROOT_DIR}/translation/SDSInterface_english.txt" "${CompiledPluginsPath}/Interface/Translations/"
+		VERBATIM
+	)
+	add_custom_command(
+		TARGET "${PROJECT_NAME}"
+		POST_BUILD
+		COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${ROOT_DIR}/translation/SDSInterface_russian.txt" "${CompiledPluginsPath}/Interface/Translations/"
 		VERBATIM
 	)
 endif()

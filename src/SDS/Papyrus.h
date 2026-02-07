@@ -24,10 +24,30 @@ namespace SDS
 
 	};
 
+	class OpenLevelUpMenuHandler : public SKSE::RegistrationSet<INT32>
+	{
+		public:
+		static OpenLevelUpMenuHandler* GetSingleton();
+
+			static constexpr char EVN_NAME[] = "ShowLevelUpMenu";
+		private:
+			using Base = SKSE::RegistrationSet<INT32>;
+
+			OpenLevelUpMenuHandler();
+			OpenLevelUpMenuHandler(const OpenLevelUpMenuHandler&) = delete;
+			OpenLevelUpMenuHandler(OpenLevelUpMenuHandler&&) = delete;
+			~OpenLevelUpMenuHandler() = default;
+
+			OpenLevelUpMenuHandler& operator=(const OpenLevelUpMenuHandler&) = delete;
+			OpenLevelUpMenuHandler& operator=(OpenLevelUpMenuHandler&&) = delete;
+
+	};
+
 	class SDSInterface
 	{
 		public:
 			static void SDSClassSelected(RE::StaticFunctionTag*, std::string name);
+			static void ShowLevelUpMenu(RE::StaticFunctionTag*);
 
 			static bool Register(RE::BSScript::IVirtualMachine* vm);
 

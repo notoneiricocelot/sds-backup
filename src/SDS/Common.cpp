@@ -2,7 +2,6 @@
 
 namespace SDS
 {
-
 	const char* SDSFocusToString(SDSFocus a_focus)
 	{
 		switch (a_focus) {
@@ -29,6 +28,36 @@ namespace SDS
 		return SDSFocus::kNone;
 	}
 
+	SDSFocus SDSFocusByAV(RE::ActorValue av)
+	{
+		switch (av)
+		{
+		case RE::ActorValue::kOneHanded:
+		case RE::ActorValue::kTwoHanded:
+		case RE::ActorValue::kBlock:
+		case RE::ActorValue::kSmithing:
+		case RE::ActorValue::kHeavyArmor:
+		case RE::ActorValue::kLightArmor:
+			return SDSFocus::kCombat;
+		case RE::ActorValue::kSneak:
+		case RE::ActorValue::kPickpocket:
+		case RE::ActorValue::kArchery:
+		case RE::ActorValue::kLockpicking:
+		case RE::ActorValue::kSpeech:
+		case RE::ActorValue::kAlchemy:
+			return SDSFocus::kStealth;
+		case RE::ActorValue::kIllusion:
+		case RE::ActorValue::kConjuration:
+		case RE::ActorValue::kEnchanting:
+		case RE::ActorValue::kAlteration:
+		case RE::ActorValue::kDestruction:
+		case RE::ActorValue::kRestoration:
+			return SDSFocus::kStealth;
+		default:
+			return SDSFocus::kNone;
+		}
+	}
+
 	float SDSLeveledValue::GetClosest(int playerLevel)
 	{
 		// if config is simple
@@ -52,14 +81,14 @@ namespace SDS
 		return SDSAttribute::kNone;
 	}
 
-	float SDSLeveledAttribute::GetAttributePerkFunctionValue([[maybe_unused]] SDSLeveledValue* val)
+	float SDSLeveledAttribute::GetAttributePerkFunctionValue(RE::Character* actor, SDSLeveledValue*)
 	{
 		// TODO get perk data multiplier
 		float perkMultiplier = 0.01f;
-		return (1 + (GetBaseActorValue() * perkMultiplier));
+		return (1 + (GetBaseActorValue(actor) * perkMultiplier));
 	}
 
-	void SDSLeveledAttribute::ToGFxValue(int multiplier, int playerLevel, RE::GFxValue* value)
+	void SDSLeveledAttribute::ToGFxValue(RE::Character* actor, int multiplier, int playerLevel, RE::GFxValue* value)
 	{
 		double newValue;
 		RE::GFxValue avValue;
@@ -68,7 +97,7 @@ namespace SDS
 		{
 			if (it->av == RE::ActorValue::kNone)
 			{
-				newValue = multiplier * GetAttributePerkFunctionValue(it._Ptr);
+				newValue = multiplier * GetAttributePerkFunctionValue(actor, it._Ptr);
 			}
 			else
 			{
@@ -112,23 +141,21 @@ namespace SDS
 		}
 	}
 
-	float SDSLeveledAttribute::GetBaseActorValue()
+	float SDSLeveledAttribute::GetBaseActorValue(RE::Character* actor)
 	{
-		RE::ActorValueOwner* playerAVs = RE::PlayerCharacter::GetSingleton()->AsActorValueOwner();
-		return playerAVs->GetBaseActorValue(GetAccociatedActorValue());
+		return actor->AsActorValueOwner()->GetBaseActorValue(GetAccociatedActorValue());
 	}
 
-	void SDSLeveledAttribute::SetBaseActorValue(float val)
+	void SDSLeveledAttribute::SetBaseActorValue(RE::Character* actor, float val)
 	{
-		RE::ActorValueOwner* playerAVs = RE::PlayerCharacter::GetSingleton()->AsActorValueOwner();
-		playerAVs->SetBaseActorValue(GetAccociatedActorValue(), val);
+		actor->AsActorValueOwner()->SetBaseActorValue(GetAccociatedActorValue(), val);
 	}
 
-	void SDSLeveledAttribute::IncrementAttribute(float val)
+	void SDSLeveledAttribute::IncrementAttribute(RE::Character* actor, float val)
 	{
-		RE::ActorValueOwner* playerAVs = RE::PlayerCharacter::GetSingleton()->AsActorValueOwner();
+		RE::ActorValueOwner* avOwner = actor->AsActorValueOwner();
 		RE::ActorValue accociatedAV = GetAccociatedActorValue(); 
-		playerAVs->SetBaseActorValue(accociatedAV, val + playerAVs->GetBaseActorValue(accociatedAV));
+		avOwner->SetBaseActorValue(accociatedAV, val + avOwner->GetBaseActorValue(accociatedAV));
 	}
 
 	const char* SDSLeveledAttribute::NameByAttribute(SDSAttribute attr)

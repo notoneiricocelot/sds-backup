@@ -12,12 +12,18 @@ namespace SDS
 	bool SDSInterface::Register(RE::BSScript::IVirtualMachine* a_vm)
 	{
 		a_vm->RegisterFunction(OnClassAcceptedHandler::EVN_NAME, PapyrusClass, SDSClassSelected);
+		a_vm->RegisterFunction(OpenLevelUpMenuHandler::EVN_NAME, PapyrusClass, ShowLevelUpMenu);
 		return true;
 	}
 
 	void SDSInterface::SDSClassSelected(RE::StaticFunctionTag*, [[maybe_unused]] std::string name)
 	{
 
+	}
+
+	void SDSInterface::ShowLevelUpMenu(RE::StaticFunctionTag*)
+	{
+		RE::UIMessageQueue::GetSingleton()->AddMessage(RE::LevelUpMenu::MENU_NAME, RE::UI_MESSAGE_TYPE::kShow, nullptr);
 	}
 
 	OnClassAcceptedHandler* OnClassAcceptedHandler::GetSingleton()
@@ -27,6 +33,16 @@ namespace SDS
 	}
 
 	OnClassAcceptedHandler::OnClassAcceptedHandler() :
+		Base(EVN_NAME)
+	{}
+
+	OpenLevelUpMenuHandler* OpenLevelUpMenuHandler::GetSingleton()
+	{
+		static OpenLevelUpMenuHandler singleton;
+		return &singleton;
+	}
+
+	OpenLevelUpMenuHandler::OpenLevelUpMenuHandler() :
 		Base(EVN_NAME)
 	{}
 

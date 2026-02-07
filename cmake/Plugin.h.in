@@ -15,5 +15,5 @@ namespace Plugin
 		// clang-format on
 	};
 
-	inline constexpr std::string NAME = "@PROJECT_NAME@";
+	inline constexpr std::string_view NAME = "@PROJECT_NAME@";
 }

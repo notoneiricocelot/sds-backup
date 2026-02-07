@@ -4,6 +4,9 @@
 
 namespace SDS
 {
+	void ReadBoolSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, bool& a_setting);
+	void ReadUInt32Setting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, uint32_t& a_setting);
+	void ReadFloatSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, float& a_setting);
 
 	struct Settings
 	{
@@ -28,18 +31,25 @@ namespace SDS
 			MCM leveling settings
 			[General]
 		*/
-		static inline bool bSSLDebugEnabled = false;
+		static inline bool bDebugEnabled = false;
+		static inline int iLogLevel = 0;
 
 		static inline int iMaxLevelsPerSkillPerPlayerLevel = 5;
 		static inline int iSkillPointCost0 = 3;
 		static inline int iSkillPointCost25 = 5;
 		static inline int iSkillPointCost50 = 7;
 		static inline int iSkillPointCost75 = 9;
+
 		static inline int iSkillPointsPerLevel = 15;
+		static inline int iAttributePointsPerLevel = 3;
+
 		static inline int iSkillPointsCap = 45;
 		static inline int iBaseAttributeValue = 20;
+
 		static inline int iClassBaseAttributeBonus = 5;
-		static inline int iClassBaseSkillBonus = 5;
+		static inline int8_t iClassBaseSkillBonus = 5;
+
+		static inline int iAttributeCap = 100;
 
 		static inline float fSkillPointsLevelMultiplier = 1.5f;
 
@@ -53,9 +63,7 @@ namespace SDS
 		static inline int iMaxPlayerLevel_Experience = 255;
 		static inline bool bUseRacialCaps_Experience = true;
 
-		static void ReadBoolSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, bool& a_setting);
-		static void ReadUInt32Setting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, uint32_t& a_setting);
-		static void ReadFloatSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, float& a_setting);
+		static inline int iMaxSkillLevel_Uncapper = 150;
 
 		/**
 			* The serialization handler for reverting game state.
@@ -82,8 +90,10 @@ namespace SDS
 			 */
 		static void OnGameLoaded(SKSE::SerializationInterface* serde);
 
+		// List of DSLike attribute structs
 		static inline std::vector<SDSLeveledAttribute> LevelingSettings;
 
+		// Runtime data for player and other characters
 		static inline std::unique_ptr<PlayerData> Saved = std::make_unique<PlayerData>();
 
 		static inline std::mutex _lock;

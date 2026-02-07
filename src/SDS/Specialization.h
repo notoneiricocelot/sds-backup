@@ -34,7 +34,10 @@ namespace SDS
 		SDSAttribute GetFirstAttribute() const { return firstAttribute; }
 
 		SDSAttribute GetSecondAttribute() const { return secondAttribute; }
-		int skills[6];
+		std::string equipment;
+
+		static const size_t SKILLS_MAX = 6;
+		int skills[SKILLS_MAX];
 
 		void ToGfxValue(RE::GFxValue* val, RE::GPtr<RE::GFxMovieView> uiMovie);
 

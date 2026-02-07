@@ -3,18 +3,6 @@
 namespace SDS
 {
 
-	class LevelUpMenuHandler
-	{
-		public:
-			static void OnMenuChange(bool isOpening);
-	};
-
-	class RaceMenuHandler
-	{
-		public:
-			static void OnMenuChange(bool isOpening);
-	};
-
 	/**
 	 *
 	 * <p>
@@ -57,4 +45,4 @@ namespace SDS
 			SDSScaleform& operator=(const SDSScaleform&) = delete;
 			SDSScaleform& operator=(SDSScaleform&&) = delete;
 	};
-}  // namespace SDS
+}

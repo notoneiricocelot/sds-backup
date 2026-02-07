@@ -107,6 +107,7 @@ namespace SDS
 	{
 		const uint8_t efficiencyBase = 0;
 		double newValue = 0.00;
+		RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
 
 		for (auto it = Settings::LevelingSettings.begin(); it < Settings::LevelingSettings.end(); it++)
 		{
@@ -114,7 +115,7 @@ namespace SDS
 			{
 				if (avIt->av == RE::ActorValue::kNone)
 				{
-					newValue = efficiencyBase + it->GetAttributePerkFunctionValue(avIt._Ptr);
+					newValue = efficiencyBase + it->GetAttributePerkFunctionValue(player, avIt._Ptr);
 					perkValues->SetMember(avIt->name, RE::GFxValue(newValue));
 				}
 			}

@@ -67,7 +67,10 @@ namespace SDS
 
 			toml::value generalSettings = toml::find<toml::value>(data, "generalSettings");
 			Settings::bDebugEnabled = static_cast<bool>(toml::find<toml::integer>(generalSettings, "bDebugEnabled"));
-			Settings::iLogLevel = static_cast<int>(toml::find<toml::integer>(generalSettings, "iLogLevel"));
+			Settings::iLogLevel = static_cast<spdlog::level::level_enum>(toml::find<toml::integer>(generalSettings, "iLogLevel"));
+
+			std::string travelKW = toml::find<toml::string>(generalSettings, "sTravelActivatorKW");
+			Settings::Saved->bonfireKW = GetTESFormFromSetting<RE::BGSKeyword>(travelKW);
 
 			SKSE::log::info("{} classes loaded, processing leveling settings", Specialization::Specializations.size());
 
@@ -96,13 +99,16 @@ namespace SDS
 			assert(Settings::iSkillPointsPerLevel > 0);
 			SKSE::log::info("Leveling settings loaded, processing racial bonuses");
 
+			toml::value menuList = toml::find<toml::value>(data, "menuList");
+			Settings::bTravelMenuEnabled = static_cast<bool>(toml::find<toml::integer>(menuList, "bTravelMenu"));
+
 			// Load racial bonuses
-			toml::table racialBonuses = toml::find<toml::table>(data, "racialBonuses");
+			toml::table itTable = toml::find<toml::table>(data, "racialBonuses");
 
 			RE::FormID raceForm;
 			std::array<int, 9> raceAttributes;
 
-			for (const auto& raceData : racialBonuses)
+			for (const auto &raceData : itTable)
 			{
 				raceForm = std::stoul(raceData.first.c_str(), nullptr, 16);
 				raceAttributes = toml::get<std::array<int, 9>>(raceData.second);
@@ -112,6 +118,19 @@ namespace SDS
 				{
 					Settings::LevelingSettings[i].racialBonuses[raceForm] = raceAttributes[i];
 				}
+			}
+
+			itTable.clear();
+			itTable = toml::find<toml::table>(data, "trainingsPerLevel");
+			Settings::trainingData = {};
+
+			int k = 0, v = 0;
+			for (const auto& trainingEntry : itTable)
+			{
+				k = std::stoi(trainingEntry.first.c_str(), nullptr, 10);
+				v = static_cast<int>(trainingEntry.second.as_integer());
+
+				Settings::trainingData.push_back({ k, v });
 			}
 
 			SKSE::log::info("Racial bonuses updated, processing attribute leveling tables");
@@ -137,7 +156,7 @@ namespace SDS
 						{
 							leveledKey = std::atoi(kv.first.c_str());
 							leveledValue = static_cast<float>(kv.second.as_floating(std::nothrow));
-							avIt->leveledValues.insert({ leveledKey, leveledValue });
+							avIt->leveledValues.push_back({ leveledKey, leveledValue });
 						}
 					}
 					else if (Settings::bDebugEnabled && avIt->av != RE::ActorValue::kNone)
@@ -222,6 +241,8 @@ namespace SDS
 			// Faith perk
 			Settings::LevelingSettings[8].perkEntry = dataHandler->LookupForm<RE::BGSPerk>(0x000808, "SDSInterface.esp");
 		}
+
+
 	}
 
 	void Settings::ReadSettings()
@@ -262,28 +283,24 @@ namespace SDS
 
 	void Settings::OnPostLoadGame()
 	{
-		Settings::selectedSpecIndex = Specialization::Find(Settings::Saved->SelectedSpecializationID);
+		Settings::Saved->PlayerSpecIndex = Specialization::Find(Settings::Saved->PlayerSpec);
 
-		RE::ActorValueList* playerAVs = RE::ActorValueList::GetSingleton();
-
-		// disable skill experience gain from skills use
-		for (RE::ActorValue i = RE::ActorValue::kOneHanded; i <= RE::ActorValue::kEnchanting;)
-		{
-			playerAVs->GetActorValue(i)->skill->useMult = 0;
-
-			i = static_cast<RE::ActorValue>(static_cast<int>(i) + 1);
-		}
+		ResetSkillUse();
 	}
 
 	void Settings::OnRevert([[maybe_unused]] SKSE::SerializationInterface* serde)
 	{
 		std::unique_lock lock(_lock);
 
-		Settings::Saved->SelectedSpecializationID = "";
+		Settings::Saved->PlayerSpecIndex = -1;
+		Settings::Saved->PlayerSpec = "";
+		Settings::Saved->RemainingAttributes = 0;
 		Settings::Saved->RemainingSkillPoints = 0;
 		Settings::Saved->CombatSkillPoints = 0;
 		Settings::Saved->StealthSkillPoints = 0;
 		Settings::Saved->MagicSkillPoints = 0;
+
+		Settings::Saved->bBonfireOpened = false;
 	}
 
 	void Settings::OnGameLoaded(SKSE::SerializationInterface* serde)
@@ -298,7 +315,8 @@ namespace SDS
 		{
 			if (type == SpecializationRecord)
 			{
-				serde->ReadRecordData(&Settings::Saved->SelectedSpecializationID, sizeof(Settings::Saved->SelectedSpecializationID));
+				serde->ReadRecordData(&Settings::Saved->PlayerSpec, sizeof(Settings::Saved->PlayerSpec));
+				serde->ReadRecordData(&Settings::Saved->RemainingAttributes, sizeof(Settings::Saved->RemainingAttributes));
 				serde->ReadRecordData(&Settings::Saved->RemainingSkillPoints, sizeof(Settings::Saved->RemainingSkillPoints));
 
 				serde->ReadRecordData(&Settings::Saved->CombatSkillPoints, sizeof(Settings::Saved->CombatSkillPoints));
@@ -306,7 +324,7 @@ namespace SDS
 				serde->ReadRecordData(&Settings::Saved->MagicSkillPoints, sizeof(Settings::Saved->MagicSkillPoints));
 			}
 		}
-		SKSE::log::info("Config loaded, class: {}, remaining skillPoints: {}", Settings::Saved->SelectedSpecializationID, Settings::Saved->RemainingSkillPoints);
+		SKSE::log::info("Config loaded, class: {}, remaining skillPoints: {}", Settings::Saved->PlayerSpec, Settings::Saved->RemainingSkillPoints);
 	}
 
 	void Settings::OnGameSaved(SKSE::SerializationInterface* serde)
@@ -319,7 +337,8 @@ namespace SDS
 			return;
 		}
 
-		serde->WriteRecordData(&Settings::Saved->SelectedSpecializationID, sizeof(Settings::Saved->SelectedSpecializationID));
+		serde->WriteRecordData(&Settings::Saved->PlayerSpec, sizeof(Settings::Saved->PlayerSpec));
+		serde->WriteRecordData(&Settings::Saved->RemainingAttributes, sizeof(Settings::Saved->RemainingAttributes));
 		serde->WriteRecordData(&Settings::Saved->RemainingSkillPoints, sizeof(Settings::Saved->RemainingSkillPoints));
 
 		serde->WriteRecordData(&Settings::Saved->CombatSkillPoints, sizeof(Settings::Saved->CombatSkillPoints));

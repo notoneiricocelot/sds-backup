@@ -1,10 +1,14 @@
 #include <SKSE/SKSE.h>
 
 #include "Scaleform.h"
+#include "Settings.h"
 
 #include "HooksCore.h"
+#include "HandlerDialogueMenu.h"
 #include "HandlerLevelUpMenu.h"
 #include "HandlerRaceSexMenu.h"
+
+#include "BonfireMenu.h"
 
 namespace SDS
 {
@@ -13,10 +17,14 @@ namespace SDS
 	{
 		auto ui = RE::UI::GetSingleton();
 		ui->GetEventSource<RE::MenuOpenCloseEvent>()->AddEventSink(SDSScaleform::GetSingleton());
-		SKSE::log::info("Registered {} event"sv, typeid(RE::MenuOpenCloseEvent).name());
+		if (Settings::bDebugEnabled && Settings::iLogLevel <= spdlog::level::level_enum::info)
+			SKSE::log::info("Registered {} event"sv, typeid(RE::MenuOpenCloseEvent).name());
+
+		RE::UI::GetSingleton()->Register(BonfireMenu::MENU_NAME, BonfireMenu::Creator);
+
 	}
 
-	SDSScaleform::EventResult SDSScaleform::ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*)
+	RE::BSEventNotifyControl SDSScaleform::ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*)
 	{
 		//if (Settings::bSSLDebugEnabled && a_event && a_event->opening)
 			// SKSE::log::info("{} is opening", a_event->menuName);
@@ -27,15 +35,16 @@ namespace SDS
 		}
 		else if (a_event && a_event->menuName == RE::LevelUpMenu::MENU_NAME)
 		{
-			HandlerLevelUpMenu::OnMenuChange(a_event->opening);
+			SDSHandlerLevelUpMenu::OnMenuChange(a_event->opening);
 		}
 		else if (a_event && a_event->menuName == RE::DialogueMenu::MENU_NAME)
 		{
+			SDSHandlerDialogueMenu::OnMenuChange(a_event->opening);
 		}
 		else if (a_event && a_event->menuName == RE::TweenMenu::MENU_NAME)
 		{
 		}
-		return EventResult::kContinue;
+		return RE::BSEventNotifyControl::kContinue;
 	}
 
 	SDSScaleform::SDSScaleform() :

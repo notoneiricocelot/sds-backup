@@ -1,17 +1,29 @@
 #pragma once
 
-namespace SDS
+namespace SDSHandlerLevelUpMenu
 {
-	class HandlerLevelUpMenu
+	void ReloadUI();
+	void AddStats();
+
+	class ConfirmLevelUpMessageCallback : public RE::IMessageBoxCallback
 	{
-		public:
-			static void OnMenuChange(bool isOpening);
+	public:
+		ConfirmLevelUpMessageCallback();
 
-			static void CompleteLevelUp(const RE::FxDelegateArgs& a_params);
-			static void CalculatePlayerStatsForAttribute(const RE::FxDelegateArgs& a_params);
-			static void HighlightPlayerCard(const RE::FxDelegateArgs& a_params);
+		virtual ~ConfirmLevelUpMessageCallback() = default;
 
-			static void AddStats();
+		virtual void Run(RE::IMessageBoxCallback::Message) override;
 	};
 
+	void OnMenuChange(bool isOpening);
+
+	void CompleteLevelUp(const RE::FxDelegateArgs&);
+	void CalculatePlayerStatsForAttribute(const RE::FxDelegateArgs&);
+	void HighlightPlayerCard(const RE::FxDelegateArgs&);
+	void CloseMenu(const RE::FxDelegateArgs&);
+
+	void AddHooks();
+
+	bool StatsMenu_IsLevelUpAvailable(RE::PlayerCharacter::PlayerSkills*);
+	inline REL::Relocation<decltype(StatsMenu_IsLevelUpAvailable)> _StatsMenu_IsLevelUpAvailable;
 }

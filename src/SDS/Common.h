@@ -1,7 +1,16 @@
 #pragma once
 
+#ifndef SDSBonfireSitAnimationStart
+#	define SDSBonfireSitAnimationStart "IdleSitCrossLeggedEnter"
+#	define SDSBonfireSitAnimationEnd "tailSitCrossLegged"
+#	define SDSBonfireSitAnimationRecovery "IdleSitCrossLeggedExit"
+#	define SDSAnimDefaultState "IdleForceDefaultState"
+#endif  // !SDSBonfireSitAnimationStart
+
 namespace SDS
 {
+
+	void ResetSkillUse();
 
 	template <class T>
 	T* GetTESFormFromSetting(std::string &confLine)
@@ -38,7 +47,7 @@ namespace SDS
 	struct SDSLeveledValue
 	{
 		RE::ActorValue av;
-		std::map<int, float> leveledValues;
+		std::vector<std::pair<int, float>> leveledValues;
 		const char* name;
 		uint16_t perkEntryIndex;
 
@@ -46,8 +55,6 @@ namespace SDS
 			av(a_av), name(a_name), perkEntryIndex(0)
 		{
 		}
-
-		float GetClosest(int playerLevel);
 	};
 
 	struct SDSLeveledAttribute
@@ -76,19 +83,20 @@ namespace SDS
 			};
 		}
 
-		void ToGFxValue(RE::Character* actor, int multiplier, int playerLevel, RE::GFxValue* value);
-		float GetAttributePerkFunctionValue(RE::Character*, SDSLeveledValue* val);
+		void ToGFxValue(RE::Character*, int, int, RE::GFxValue*);
+		float GetAttributePerkFunctionValue(RE::Character*, SDSLeveledValue*);
 
 		RE::ActorValue GetAccociatedActorValue();
 
 		float GetBaseActorValue(RE::Character*);
 		void SetBaseActorValue(RE::Character*, float);
-		void IncrementAttribute(RE::Character*, float val);
+		void IncrementAttribute(RE::Character*, float);
 
-		static const char* NameByAttribute(SDSAttribute attr);
+		static const char* NameByAttribute(SDSAttribute);
 	};
 
-	SDSAttribute SDSAttributeByName(const char* attr_name);
+	SDSAttribute SDSAttributeByName(const char*);
+	SDSAttribute SDSAttributeBySkill(RE::ActorValue);
 
 	enum class InventoryDefine : int
 	{
@@ -113,25 +121,52 @@ namespace SDS
 
 	struct PlayerData
 	{
-		std::string SelectedSpecializationID;
+		std::string PlayerSpec;
+		int PlayerSpecIndex;
+
+		int lastLevelChange;
 		int RemainingSkillPoints;
+		int RemainingAttributes;
 
 		int CombatSkillPoints;
 		int StealthSkillPoints;
 		int MagicSkillPoints;
 
+		RE::BGSKeyword* bonfireKW;
+		bool bBonfireOpened;
+
 		PlayerData(const std::string& SelectedSpecializationID, int RemainingSkillPoints) :
-			SelectedSpecializationID(SelectedSpecializationID), RemainingSkillPoints(RemainingSkillPoints)
+			PlayerSpec(SelectedSpecializationID), RemainingSkillPoints(RemainingSkillPoints)
 		{
 		}
 
-		PlayerData(){
-			SelectedSpecializationID = "";
+		PlayerData()
+		{
+			PlayerSpec = "";
+			PlayerSpecIndex = 0;
+
+			lastLevelChange = 0;
+			RemainingAttributes = 0;
 			RemainingSkillPoints = 0;
 
 			CombatSkillPoints = 0;
 			StealthSkillPoints = 0;
 			MagicSkillPoints = 0;
+
+			bBonfireOpened = false;
 		};
+
+		void AddSkillPoints(SDSFocus, int);
+		int GetSkillPoints(SDSFocus);
 	};
+
+	template <class T>
+	T lower_bound_key(int searchValue, std::vector<std::pair<int, T>> &collection)
+	{
+		for (auto it = collection.begin(); it <= collection.end(); it++) {
+			if (searchValue <= (*it).first)
+				return (*it).second;
+		}
+		return collection.back().second;
+	}
 }

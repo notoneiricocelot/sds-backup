@@ -1,5 +1,6 @@
 #include "HandlerRaceSexMenu.h"
 
+#include "Common.h"
 #include "Specialization.h"
 #include "Settings.h"
 
@@ -36,7 +37,7 @@ namespace SDSHandlerRaceSexMenu
 	{
 		if (isOpening)
 		{
-			if (SDS::Settings::Saved->SelectedSpecializationID.length() > 0)
+			if (SDS::Settings::Saved->PlayerSpec.length() > 0)
 				return;
 
 			ToggleEquipmentSounds(true);
@@ -59,7 +60,7 @@ namespace SDSHandlerRaceSexMenu
 
 			SDSHooksCore::GfxMovieView_InvokeCallback(raceMenuMovie.get(), "SetClassList", &classData);
 
-			if (SDS::Settings::bDebugEnabled && SDS::Settings::iLogLevel > 3)
+			if (SDS::Settings::bDebugEnabled && SDS::Settings::iLogLevel <= spdlog::level::level_enum::info)
 				SKSE::log::info("Menu {} loaded, {} classes added"sv, RE::RaceSexMenu::MENU_NAME, classArray.GetArraySize());
 		}
 		else
@@ -82,8 +83,10 @@ namespace SDSHandlerRaceSexMenu
 			it->SetBaseActorValue(player, 0.0f + SDS::Settings::iBaseAttributeValue);
 		}
 
-		SDS::Settings::Saved->SelectedSpecializationID = std::string(a_id);
-		if (SDS::Settings::bDebugEnabled)
+		SDS::Settings::Saved->PlayerSpec = std::string(a_id);
+		SDS::Settings::Saved->PlayerSpecIndex = SDS::Specialization::Find(a_id);
+
+		if (SDS::Settings::bDebugEnabled && SDS::Settings::iLogLevel <= spdlog::level::level_enum::info)
 			SKSE::log::info("Class {} selected"sv, a_id);
 	}
 
@@ -103,7 +106,7 @@ namespace SDSHandlerRaceSexMenu
 		const int raceID = static_cast<int>(a_params[0].GetUInt());
 		const char* specID = a_params[1].GetString();
 
-		if (SDS::Settings::bDebugEnabled && SDS::Settings::iLogLevel > 3)
+		if (SDS::Settings::bDebugEnabled && SDS::Settings::iLogLevel <= spdlog::level::level_enum::info)
 			SKSE::log::info("Updating ui bonuses for spec {} and race {}"sv, specID, raceID);
 
 		int selectedSpecIndex = SDS::Specialization::Find(specID);
@@ -198,11 +201,6 @@ namespace SDSHandlerRaceSexMenu
 		RemoveAllPlayerItems(true);
 	}
 
-	void UpdateCameraPositionCallback(const RE::FxDelegateArgs&)
-	{
-		UpdateCameraPosition();
-	}
-
 	void ToggleEquipmentSounds(bool doMute)
 	{
 		// TODO
@@ -227,13 +225,13 @@ namespace SDSHandlerRaceSexMenu
 	{
 		REL::Relocation<uintptr_t> raceSexCamera_Hook1{ RELOCATION_ID(51482, 0) };  // 8AFF40 + 143/call
 		REL::Relocation<uintptr_t> raceSexCamera_Hook2{ RELOCATION_ID(51484, 0) };  // 8B0A60 + 132/call
-		REL::Relocation<uintptr_t> msgBoxConfirm_Hook3{ RELOCATION_ID(51540, 0) };  // 8BA590 + 168/call
+		REL::Relocation<uintptr_t> changeName_Hook3{ RELOCATION_ID(51488, 0) };     // 8b1360 + 65/call
 
 		SKSE::Trampoline& trampoline = SKSE::GetTrampoline();
 		_UpdateCamera_ShowHook = trampoline.write_call<5>(raceSexCamera_Hook1.address() + RELOCATION_OFFSET(0x143, 0x0), &UpdateCamera_ShowHook);
 		_UpdateCamera_AdvanceMovieHook = trampoline.write_call<5>(raceSexCamera_Hook2.address() + RELOCATION_OFFSET(0x132, 0x0), &UpdateCamera_AdvanceMovieHook);
 
-		_MessageBox_CloseMenuHook = trampoline.write_call<5>(msgBoxConfirm_Hook3.address() + RELOCATION_OFFSET(0x168, 0x0), &MessageBox_CloseMenuHook);
+		_ChangeName_SetNameText = trampoline.write_call<5>(changeName_Hook3.address() + RELOCATION_OFFSET(0x65, 0x0), &ChangeName_SetNameText);
 	}
 
 	void UpdateCamera_ShowHook(RE::RaceSexMenu* a_this)
@@ -248,28 +246,42 @@ namespace SDSHandlerRaceSexMenu
 		UpdateCameraPosition();
 	}
 
-	void MessageBox_CloseMenuHook(RE::RaceSexMenu* a_this)
+	void ChangeName_SetNameText(RE::RaceSexMenu* a_this, const char* newName)
 	{
-		_MessageBox_CloseMenuHook(a_this);
+		_ChangeName_SetNameText(a_this, newName);
 
 		int i = 0;
+		RE::ActorValue avID = RE::ActorValue::kNone;
 		RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
-	
-		for (; i < SDS::Specialization::Specialization::SKILLS_MAX; i++)
-		{
-			if (SDS::Specialization::Specializations[SDS::Settings::selectedSpecIndex]->skills[i] > 0)
-				SDSHooksCore::PlayerCharacter_IncrementSkillHook(player, static_cast<RE::ActorValue>(SDS::Specialization::Specializations[SDS::Settings::selectedSpecIndex]->skills[i]), SDS::Settings::iClassBaseSkillBonus);
+
+		bool shortMenu = false; // TODO
+		if (shortMenu)
+			return;
+
+		// ??? Replacing basic player stats with attributes ???
+		// TODO may be
+
+		// Applying skill bonuses from selected class to the player
+		for (; i < SDS::Specialization::Specialization::SKILLS_MAX;) {
+			if (SDS::Specialization::Specializations[SDS::Settings::Saved->PlayerSpecIndex]->skills[i] > 0)
+			{
+				avID = static_cast<RE::ActorValue>(SDS::Specialization::Specializations[SDS::Settings::Saved->PlayerSpecIndex]->skills[i]);
+				player->SetBaseActorValue(avID, SDS::Settings::iClassBaseSkillBonus + player->GetBaseActorValue(avID));
+				// SDSHooksCore::PlayerCharacter_IncrementSkillHook(player, avID, SDS::Settings::iClassBaseSkillBonus);
+			}
+
+			i += 1;
 		}
 
-		for (i = 0; i < SDS::SDSAttribute::kFaith; i++)
-		{
-			SDS::Settings::LevelingSettings[i].SetBaseActorValue(player, SDS::Settings::iBaseAttributeValue + 0.0f);
-		}
-
-		SDS::SDSAttribute attr1 = SDS::Specialization::Specializations[SDS::Settings::selectedSpecIndex]->GetFirstAttribute();
-		SDS::SDSAttribute attr2 = SDS::Specialization::Specializations[SDS::Settings::selectedSpecIndex]->GetSecondAttribute();
+		// Adding attribute bonuses from class to the player
+		SDS::SDSAttribute attr1 = SDS::Specialization::Specializations[SDS::Settings::Saved->PlayerSpecIndex]->GetFirstAttribute();
+		SDS::SDSAttribute attr2 = SDS::Specialization::Specializations[SDS::Settings::Saved->PlayerSpecIndex]->GetSecondAttribute();
 
 		SDS::Settings::LevelingSettings[attr1 - 1].IncrementAttribute(player, static_cast<float>(SDS::Settings::iClassBaseAttributeBonus));
 		SDS::Settings::LevelingSettings[attr2 - 1].IncrementAttribute(player, static_cast<float>(SDS::Settings::iClassBaseAttributeBonus));
+
+		SDS::ResetSkillUse();
+
+		player->skillTrainingsThisLevel = SDS::lower_bound_key<int>(player->GetLevel(), SDS::Settings::trainingData);
 	}
 }

@@ -17,26 +17,21 @@ namespace SDS
 	void HUDHooks::LevelUpMenu_AcceptProcessorHook(RE::LevelUpMenu* a_this, RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
 		_LevelUpMenu_AcceptProcessorHook(a_this, a_processor);
-		if (Settings::bDebugEnabled && Settings::iLogLevel > 2)
-			SKSE::log::info("{}::Accept called", a_this->MENU_NAME);
-
-		a_processor->Process("completeLevelUp", HandlerLevelUpMenu::CompleteLevelUp);
-		a_processor->Process("calculatePlayerStatsForAttribute", HandlerLevelUpMenu::CalculatePlayerStatsForAttribute);
-		a_processor->Process("highlightPlayerCard", HandlerLevelUpMenu::HighlightPlayerCard);
+		a_processor->Process("CompleteLevelUp", SDSHandlerLevelUpMenu::CompleteLevelUp);
+		a_processor->Process("calculatePlayerStatsForAttribute", SDSHandlerLevelUpMenu::CalculatePlayerStatsForAttribute);
+		a_processor->Process("highlightPlayerCard", SDSHandlerLevelUpMenu::HighlightPlayerCard);
+		a_processor->Process("CloseMenu", SDSHandlerLevelUpMenu::CloseMenu);
 	}
 
 	void HUDHooks::LevelUpMenu_ConfirmLevelUpHook(RE::LevelUpMenu* a_this, void* a_data)
 	{
-		HandlerLevelUpMenu::AddStats();
+		SDSHandlerLevelUpMenu::AddStats();
 		_LevelUpMenu_ConfirmLevelUpHook(a_this, a_data);
 	}
 
 	void HUDHooks::RaceSexMenu_AcceptProcessorHook(RE::RaceSexMenu* a_this, RE::FxDelegateHandler::CallbackProcessor* a_processor)
 	{
 		_RaceSexMenu_AcceptProcessorHook(a_this, a_processor);
-		if (Settings::bDebugEnabled && Settings::iLogLevel > 2)
-			SKSE::log::info("{}::Accept called", a_this->MENU_NAME);
-
 		a_processor->Process("RemoveAllItems", SDSHandlerRaceSexMenu::RemoveAllItems);
 		a_processor->Process("ChangeClass", SDSHandlerRaceSexMenu::ChangeClass);
 		a_processor->Process("GetNewBonuses", SDSHandlerRaceSexMenu::GetNewBonuses);

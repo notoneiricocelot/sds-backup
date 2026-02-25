@@ -1,5 +1,10 @@
 #pragma once
 
+#include "Settings.h"
+
+#include "HandlerDialogueMenu.h"
+#include "HandlerLevelUpMenu.h"
+#include "HandlerTrainingMenu.h"
 #include "HandlerRaceSexMenu.h"
 
 namespace SDS
@@ -26,8 +31,15 @@ namespace SDS
 
 				REL::Relocation<uintptr_t> tweenMenuHook1{ RELOCATION_ID(51836, 0) };  // 8d0f80
 				_TweenMenu_OpenHighlightedMenu = trampoline.write_branch<5>(tweenMenuHook1.address() + RELOCATION_OFFSET(0xE, 0x0), &TweenMenu_OpenHighlightedMenu);
+				// SKSE::log::info("Trampo default hooks size: {}", trampoline.allocated_size());
 
+				SDSHandlerLevelUpMenu::AddHooks();
 				SDSHandlerRaceSexMenu::AddHooks();
+				SDSHandlerTrainingMenu::AddHooks();
+				SDSHandlerDialogueMenu::AddHooks();
+
+				if (Settings::bDebugEnabled && Settings::iLogLevel >= 1)
+					SKSE::log::info("Trampo result size: {}", trampoline.allocated_size());
 			}
 
 		public:

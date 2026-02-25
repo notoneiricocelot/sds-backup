@@ -3,9 +3,11 @@
 	* ✓ Remove R button hotkey ✓
 	* ✓ Fix camera ✓
 	* ✓ Disable equip/unequip sounds ✓
-	* Disable skill leveling sounds on character creation
+	* ✓ Disable skill leveling sounds on character creation ✓
 	* Proper attributes calculation on finalizing character
-* * Bonfire Menu
+* Bonfire Menu
 	* Sit animation with proper positioning
 	* Travel menu
 	* Estus enchanting menu
+* LevelUp Menu
+	* Track more user actions for better stats selection limits

@@ -2,6 +2,23 @@
 
 namespace SDS
 {
+	void ResetSkillUse()
+	{
+		RE::ActorValueList* playerAVs = RE::ActorValueList::GetSingleton();
+		RE::PlayerCharacter* player = RE::PlayerCharacter::GetSingleton();
+
+		// disable skill experience gain from skills use
+		int avIndex = 0;
+		for (RE::ActorValue i = RE::ActorValue::kOneHanded; i <= RE::ActorValue::kEnchanting;) {
+			playerAVs->GetActorValue(i)->skill->useMult = 0;
+
+			avIndex = static_cast<int>(i) - 6;
+			player->skills->data->skills[avIndex].xp = 0;
+
+			i = static_cast<RE::ActorValue>(static_cast<int>(i) + 1);
+		}
+	}
+
 	const char* SDSFocusToString(SDSFocus a_focus)
 	{
 		switch (a_focus) {
@@ -17,8 +34,7 @@ namespace SDS
 	SDSFocus SDSFocusByName(const char* a_name)
 	{
 		SDSFocus attr = SDSFocus::kCombat;
-		for (; attr <= SDSFocus::kStealth;)
-		{
+		for (; attr <= SDSFocus::kStealth;) {
 			if (strcmp(a_name, SDSFocusToString(attr)) == 0)
 				return attr;
 
@@ -30,8 +46,7 @@ namespace SDS
 
 	SDSFocus SDSFocusByAV(RE::ActorValue av)
 	{
-		switch (av)
-		{
+		switch (av) {
 		case RE::ActorValue::kOneHanded:
 		case RE::ActorValue::kTwoHanded:
 		case RE::ActorValue::kBlock:
@@ -58,27 +73,50 @@ namespace SDS
 		}
 	}
 
-	float SDSLeveledValue::GetClosest(int playerLevel)
-	{
-		// if config is simple
-		if (this->leveledValues.size() == 1)
-			return this->leveledValues.begin()->second;
-
-		auto lower = this->leveledValues.lower_bound(playerLevel);
-		return lower->second;
-	}
-
 	SDSAttribute SDSAttributeByName(const char* attr_name)
 	{
 		SDSAttribute attr = SDSAttribute::kStrength;
-		for (; attr <= SDSAttribute::kFaith;)
-		{
+		for (; attr <= SDSAttribute::kFaith;) {
 			if (strcmp(attr_name, SDSLeveledAttribute::NameByAttribute(attr)) == 0)
 				return attr;
 
 			attr = static_cast<SDSAttribute>(static_cast<int>(attr) + 1);
 		}
 		return SDSAttribute::kNone;
+	}
+
+	SDSAttribute SDSAttributeBySkill(RE::ActorValue av)
+	{
+		switch (av)
+		{
+		case RE::ActorValue::kOneHanded:
+		case RE::ActorValue::kTwoHanded:
+			return SDSAttribute::kStrength;
+		case RE::ActorValue::kBlock:
+		case RE::ActorValue::kSmithing:
+		case RE::ActorValue::kHeavyArmor:
+			return SDSAttribute::kEndurance;
+		case RE::ActorValue::kSneak:
+		case RE::ActorValue::kPickpocket:
+		case RE::ActorValue::kArchery:
+			return SDSAttribute::kAgility;
+		case RE::ActorValue::kLightArmor:
+		case RE::ActorValue::kLockpicking:
+			return SDSAttribute::kSpeed;
+		case RE::ActorValue::kSpeech:
+		case RE::ActorValue::kIllusion:
+			return SDSAttribute::kPersonality;
+		case RE::ActorValue::kAlchemy:
+		case RE::ActorValue::kConjuration:
+		case RE::ActorValue::kEnchanting:
+			return SDSAttribute::kIntelligence;
+		case RE::ActorValue::kAlteration:
+		case RE::ActorValue::kDestruction:
+		case RE::ActorValue::kRestoration:
+			return SDSAttribute::kWillpower;
+		default:
+			return SDSAttribute::kNone;
+		}
 	}
 
 	float SDSLeveledAttribute::GetAttributePerkFunctionValue(RE::Character* actor, SDSLeveledValue*)
@@ -101,7 +139,7 @@ namespace SDS
 			}
 			else
 			{
-				newValue = it->GetClosest(playerLevel) * multiplier;
+				newValue = lower_bound_key<float>(playerLevel, (*it).leveledValues) * multiplier;
 
 				if (value->HasMember(it->name))
 				{
@@ -148,14 +186,47 @@ namespace SDS
 
 	void SDSLeveledAttribute::SetBaseActorValue(RE::Character* actor, float val)
 	{
-		actor->AsActorValueOwner()->SetBaseActorValue(GetAccociatedActorValue(), val);
+		RE::ActorValueOwner* avOwner = actor->AsActorValueOwner();
+		avOwner->SetBaseActorValue(GetAccociatedActorValue(), val);
+
+		for (size_t i = 0; i < actorValues.size(); i++)
+		{
+			if (actorValues[i].av == RE::ActorValue::kNone)
+			{
+			}
+			else
+			{
+				// TODO
+				// avOwner->SetBaseActorValue(actorValues[i].av, val * actorValues[i].GetClosest(actor->GetLevel()));
+				// avOwner->SetActorValue(actorValues[i].av, val * actorValues[i].GetClosest(actor->GetLevel()));
+			}
+		}
 	}
 
-	void SDSLeveledAttribute::IncrementAttribute(RE::Character* actor, float val)
+	void SDSLeveledAttribute::IncrementAttribute(RE::Character* actor, float attributeValue)
 	{
+		if (attributeValue == 0)
+			return;
+
 		RE::ActorValueOwner* avOwner = actor->AsActorValueOwner();
 		RE::ActorValue accociatedAV = GetAccociatedActorValue(); 
-		avOwner->SetBaseActorValue(accociatedAV, val + avOwner->GetBaseActorValue(accociatedAV));
+		avOwner->SetBaseActorValue(accociatedAV, attributeValue + avOwner->GetBaseActorValue(accociatedAV));
+		
+		int currentLevel = actor->GetLevel();
+		float newActorValue = 0;
+
+		for (size_t i = 0; i < actorValues.size(); i++)
+		{
+			if (actorValues[i].av == RE::ActorValue::kNone)
+			{
+
+			}
+			else
+			{
+				newActorValue = (lower_bound_key<float>(currentLevel, actorValues[i].leveledValues) * attributeValue) + avOwner->GetBaseActorValue(actorValues[i].av);
+				avOwner->SetBaseActorValue(actorValues[i].av, newActorValue);
+			}
+		}
 	}
 
 	const char* SDSLeveledAttribute::NameByAttribute(SDSAttribute attr)
@@ -185,4 +256,33 @@ namespace SDS
 		}
 	}
 
+	void PlayerData::AddSkillPoints(SDSFocus focus, int amount)
+	{
+		switch (focus)
+		{
+			case SDSFocus::kCombat:
+				CombatSkillPoints += amount;
+				break;
+			case SDSFocus::kMagick:
+				MagicSkillPoints += amount;
+				break;
+			case SDSFocus::kStealth:
+				StealthSkillPoints += amount;
+				break;
+		}
+	}
+
+	int PlayerData::GetSkillPoints(SDSFocus focus)
+	{
+		switch (focus)
+		{
+			case SDSFocus::kCombat:
+				return CombatSkillPoints;
+			case SDSFocus::kMagick:
+				return MagicSkillPoints;
+			case SDSFocus::kStealth:
+				return StealthSkillPoints;
+		}
+		return 0;
+	}
 }

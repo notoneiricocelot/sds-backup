@@ -5,6 +5,56 @@
 
 namespace SDS
 {
+	RE::MessageBoxData* NewMessageBox(const std::string &a_message)
+	{
+		RE::MessageDataFactoryManager* factoryManager = RE::MessageDataFactoryManager::GetSingleton();
+		RE::InterfaceStrings *gameStrings = RE::InterfaceStrings::GetSingleton();
+
+		auto factory = factoryManager->GetCreator<RE::MessageBoxData>(gameStrings->messageBoxData);
+		RE::MessageBoxData* messageBox = factory->Create();
+		messageBox->unk4C = 4;
+		messageBox->unk38 = 10;
+		messageBox->bodyText = a_message;
+
+		return messageBox;
+	}
+
+	int GetSkillLevelCap(RE::PlayerCharacter* player)
+	{
+		int skillCap = static_cast<int>(Settings::fSkillCapBase_Experience + Settings::fSkillCapMult_Experience * player->GetLevel());
+		return skillCap;
+	}
+
+	int GetSkillLevelCap(RE::PlayerCharacter* player, RE::ActorValue av)
+	{
+		int skillCapBase = GetSkillLevelCap(player);
+		RE::RACE_DATA::SkillBoost* boost = nullptr;
+		auto skillBoosts = player->GetRace()->data.skillBoosts;
+
+		for (int i = 0; i < RE::RACE_DATA::kNumSkillBoosts; i++)
+		{
+			boost = &skillBoosts[i];
+			if (boost && boost->skill.get() == av)
+			{
+				skillCapBase += boost->bonus;
+				break;
+			}
+		}
+
+		return skillCapBase;
+	}
+
+	int GetSkillpointCost(int skillLevel)
+	{
+		if (skillLevel > 74)
+			return Settings::iSkillPointCost75;
+		if (skillLevel > 49)
+			return Settings::iSkillPointCost50;
+		if (skillLevel > 24)
+			return Settings::iSkillPointCost25;
+		return Settings::iSkillPointCost0;
+	}
+
 	void ScaleformHelper::GetPlayerObject(RE::GFxValue* playerObject)
 	{
 		auto player = RE::PlayerCharacter::GetSingleton();
@@ -50,14 +100,6 @@ namespace SDS
 		playerObject->SetMember("staminaColor", playerValues[12]);
 	}
 
-	void ScaleformHelper::GetBottomBarObjectDefault(RE::GFxValue* bottombarObject)
-	{
-		RE::GFxValue itemType;
-		itemType.SetNumber(static_cast<int>(InventoryDefine::kArmor));
-
-		bottombarObject->SetMember("type", itemType);
-	}
-
 	void ScaleformHelper::GetActorBaseAVs(RE::GFxValue* av_list)
 	{
 		auto player = RE::PlayerCharacter::GetSingleton();
@@ -73,7 +115,7 @@ namespace SDS
 	void ScaleformHelper::GetPlayerSkillCaps(RE::GFxValue* av_skills)
 	{
 		auto player = RE::PlayerCharacter::GetSingleton();
-		int baseCap = static_cast<int>(Settings::fSkillCapBase_Experience + Settings::fSkillCapMult_Experience * player->GetLevel());
+		int baseCap = GetSkillLevelCap(player);
 
 		int racialBoostIndex = 0;
 		RE::RACE_DATA::SkillBoost* boost = nullptr;

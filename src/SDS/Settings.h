@@ -8,6 +8,8 @@ namespace SDS
 	void ReadUInt32Setting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, uint32_t& a_setting);
 	void ReadFloatSetting(CSimpleIniA& a_ini, const char* a_sectionName, const char* a_settingName, float& a_setting);
 
+	void LoadForms();
+
 	struct Settings
 	{
 		using Lock = std::recursive_mutex;
@@ -16,11 +18,6 @@ namespace SDS
 		static void Initialize();
 		static void ReadSettings();
 		static void OnPostLoadGame();
-
-		/*
-			Game Settings
-		*/
-		static inline int selectedSpecIndex = -1;
 
 		/*
 			Sezialization ID for Save/Load serialization
@@ -32,7 +29,9 @@ namespace SDS
 			[General]
 		*/
 		static inline bool bDebugEnabled = false;
-		static inline int iLogLevel = 0;
+		static inline spdlog::level::level_enum iLogLevel = spdlog::level::level_enum::trace;
+
+		static inline bool bTravelMenuEnabled = true;
 
 		static inline int iMaxLevelsPerSkillPerPlayerLevel = 5;
 		static inline int iSkillPointCost0 = 3;
@@ -92,6 +91,7 @@ namespace SDS
 
 		// List of DSLike attribute structs
 		static inline std::vector<SDSLeveledAttribute> LevelingSettings;
+		static inline std::vector<std::pair<int, int>> trainingData;
 
 		// Runtime data for player and other characters
 		static inline std::unique_ptr<PlayerData> Saved = std::make_unique<PlayerData>();

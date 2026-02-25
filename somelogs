@@ -168,6 +168,7 @@ Plugins to remove:
 	Levitation
 	STB Widgets
 	STB Active Effects
+	Smart Training
 	IWant Widgets
 	QuickLoot
 	Wheeler
@@ -178,3 +179,11 @@ Plugins to remove:
 
 RaceSexCamera start rotation: (4444.301 + -14712.798i + 5918.2573j + 0.13373484k)
 RaceSexCamera end rotation: (4448.003 + -14645.124i + 5918.2573j + 0.0867697k)
+
+
+IdleSitLedgeExit / 0x000c482d (IDLE)
+IdleSitLedgeEnter / 0x000c482b (IDLE)
+IdleSitCrossLeggedExit / 0x000c4efa (IDLE)
+IdleSitCrossLeggedEnter / 0x000c4ef9 (IDLE)
+IdleSitLedgeEnterInstant / 0x000c482a (IDLE)
+IdleSitCrossLeggedEnterInstant / 0x000c4efb (IDLE)

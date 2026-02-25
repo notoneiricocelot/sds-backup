@@ -276,6 +276,12 @@ iClassBaseAttributeBonus = 5
 iClassBaseSkillBonus = 5
 iAttributeCap = 100
 
+[trainingsPerLevel]
+1 = 5
+2 = 3
+25 = 2
+40 = 5
+
 [Strength.FireResist]
 1 = 0.05
 
@@ -313,7 +319,7 @@ iAttributeCap = 100
 1 = 0.05
 
 [Endurance.CarryWeight]
-1 = 1.5
+1 = 0.12
 
 [Personality.DamageResist]
 1 = 0.25

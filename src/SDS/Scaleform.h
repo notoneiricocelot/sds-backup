@@ -14,7 +14,6 @@ namespace SDS
 	{
 
 		private:
-			using EventResult = RE::BSEventNotifyControl;
 			using Lock = std::recursive_mutex;
 			using Locker = std::lock_guard<Lock>;
 
@@ -31,7 +30,7 @@ namespace SDS
 
 			static void Register();
 
-			virtual EventResult ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>* a_eventSource) override;
+			virtual RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>* a_eventSource) override;
 
 		private:
 			mutable Lock _lock;
